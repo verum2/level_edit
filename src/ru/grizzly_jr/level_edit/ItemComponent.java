@@ -18,7 +18,6 @@ public class ItemComponent extends JPanel {
 		this.setPreferredSize(new Dimension(item.getWidth(),item.getHeight()));
 	}
 
-
 	@Override
 	public void paintComponents(Graphics g) {
 		super.paintComponents(g);
