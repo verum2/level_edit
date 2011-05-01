@@ -13,7 +13,7 @@ public class ModelItem {
 	{
 		this.name = name;
 		
-		image = new BufferedImage(200, 100, BufferedImage.TYPE_INT_RGB);
+		image = new BufferedImage(300, 100, BufferedImage.TYPE_INT_RGB);
 		width = 200;
 		height = 100;
 	}
