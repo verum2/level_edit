@@ -2,7 +2,6 @@ package ru.grizzly_jr.level_edit;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Image;
 
 import javax.swing.JPanel;
 
@@ -16,7 +15,7 @@ public class ItemComponent extends JPanel {
 	{
 		this.item = item;
 		
-		this.setPreferredSize(new Dimension(100,200));
+		this.setPreferredSize(new Dimension(item.getWidth(),item.getHeight()));
 	}
 
 
@@ -24,12 +23,10 @@ public class ItemComponent extends JPanel {
 	public void paintComponents(Graphics g) {
 		super.paintComponents(g);
 		
-		Image im = item.getImage();
-		
-		if( null == im)
+		if( null == item.getImage())
 			return;
 		
-		g.drawImage(im, 0, 0, im.getWidth(null), im.getHeight(null), null);
+		g.drawImage(item.getImage(), 0, 0, item.getWidth(),item.getHeight(), null);
 	}
 
 	
