@@ -3,6 +3,8 @@ package ru.grizzly_jr.level_edit;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -18,13 +20,20 @@ public class Form extends JFrame {
 	private ComponentsPanel components_panel = new ComponentsPanel();
 	private JMenuBar menubar = new JMenuBar();
 	
+	private List<ModelItem> models = new ArrayList<ModelItem>();
+	
 	public Form()
 	{
 		super();
 		this.setLayout(new BorderLayout());
 		this.setSize(800, 600);
 		
-		editor_panel.load();
+		addModel(new ModelItem("item1",0.5,3.0));
+		addModel(new ModelItem("item2",0,0));
+		addModel(new ModelItem("item1",0.1,2.3));
+		addModel(new ModelItem("item2",1.5,5.0));
+		
+		editor_panel.load("data/back.jpg");
 		
 		initMenuBar();
 		this.setJMenuBar(menubar);
@@ -32,6 +41,26 @@ public class Form extends JFrame {
 		this.add(info_panel,BorderLayout.WEST);
 		this.add(editor_panel,BorderLayout.CENTER);
 		this.add(components_panel,BorderLayout.EAST);
+	}
+	
+	private void addModel(ModelItem model)
+	{
+		models.add(model);
+		editor_panel.addItem(model);
+		info_panel.addItem(model);
+	}
+	
+	private void removeModel(ModelItem model)
+	{
+		models.remove(model);
+		editor_panel.removeItem(model);
+		editor_panel.removeItem(model);
+	}
+	
+	private void setModels()
+	{
+		editor_panel.setItems(models);
+		info_panel.setItems(models);
 	}
 	
 	private void initMenuBar()

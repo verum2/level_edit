@@ -2,6 +2,7 @@ package ru.grizzly_jr.level_edit;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.util.List;
 
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -18,7 +19,7 @@ public class InformationPanel extends JPanel {
 	public InformationPanel()
 	{
 		super(new BorderLayout());
-		setPreferredSize(new Dimension(180-5,480));
+		setPreferredSize(new Dimension(180,480));
 		
 		JScrollPane scrollpane = new JScrollPane(list);
 		scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -26,11 +27,15 @@ public class InformationPanel extends JPanel {
 		
 		this.add(scrollpane, BorderLayout.CENTER);
 		list.setCellRenderer(new ItemCellRender());
-		
-		list_model.add(new ModelItem("test1"));
-		list_model.add(new ModelItem("test2"));
-		list_model.add(new ModelItem("test3"));
-		list_model.add(new ModelItem("test4"));
+	}
+	
+	public void setItems(List<ModelItem> list)
+	{
+		list_model.clear();
+		for( ModelItem iter: list){
+			list_model.add(iter);
+		}
+		repaint();
 	}
 	
 	public void addItem(ModelItem item)

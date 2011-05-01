@@ -21,6 +21,11 @@ public class ItemListModel extends AbstractListModel
 		objects.remove(obj);
 	}
 	
+	public void clear()
+	{
+		objects.clear();
+	}
+	
 	@Override
 	public Object getElementAt(int index) {
 		if( index < 0 || index >= objects.size())

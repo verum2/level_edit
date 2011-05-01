@@ -10,22 +10,26 @@ public class ItemComponent extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private ModelItem item;
 	
-	
 	public ItemComponent(ModelItem item)
 	{
 		this.item = item;
 		
-		this.setPreferredSize(new Dimension(item.getWidth(),item.getHeight()));
+		int width = Translate.metrsToPixel(item.getWidth());
+		int height = Translate.metrsToPixel(item.getHeight());
+		this.setPreferredSize(new Dimension(width,height+15));
 	}
 
 	@Override
-	public void paintComponents(Graphics g) {
-		super.paintComponents(g);
+	public void paint(Graphics g) {
+		super.paint(g);
 		
 		if( null == item.getImage())
 			return;
 		
-		g.drawImage(item.getImage(), 0, 111110, item.getWidth(),item.getHeight(), null);
+		int width = Translate.metrsToPixel(item.getWidth());
+		int height = Translate.metrsToPixel(item.getHeight());
+		g.drawImage(item.getImage(), 0, 0, width,height, null);
+		g.drawChars(item.name.toCharArray(), 0, item.name.length(), 0, height+12);
 	}
 
 	
