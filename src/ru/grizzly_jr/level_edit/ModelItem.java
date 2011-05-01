@@ -34,7 +34,7 @@ public class ModelItem {
 	{
 		try {
 			//TODO: jpg png
-			image = ImageIO.read(new File(path+name+".jpg"));
+			image = ImageIO.read(new File(path+name+".png"));
 			width = Translate.pixelToMetrs( image.getWidth());
 			height = Translate.pixelToMetrs( image.getHeight());
 			this.name = name;

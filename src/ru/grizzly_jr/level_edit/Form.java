@@ -25,15 +25,16 @@ public class Form extends JFrame {
 	public Form()
 	{
 		super();
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setLayout(new BorderLayout());
 		this.setSize(800, 600);
 		
-		addModel(new ModelItem("item1",0.5,3.0));
-		addModel(new ModelItem("item2",0,0));
-		addModel(new ModelItem("item1",0.1,2.3));
-		addModel(new ModelItem("item2",1.5,5.0));
+		addModel(new ModelItem("apple",0.5,3.0));
+		addModel(new ModelItem("can",0,0));
+		addModel(new ModelItem("can",0.1,2.3));
+		addModel(new ModelItem("apple",1.5,5.0));
 		
-		editor_panel.load("data/back.jpg");
+		editor_panel.load("data/back.png");
 		
 		initMenuBar();
 		this.setJMenuBar(menubar);
