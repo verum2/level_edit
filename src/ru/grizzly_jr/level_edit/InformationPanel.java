@@ -18,7 +18,7 @@ public class InformationPanel extends JPanel {
 	public InformationPanel()
 	{
 		super(new BorderLayout());
-		setPreferredSize(new Dimension(180-5,480));
+		setPreferredSize(new Dimension(180-11,480));
 		
 		JScrollPane scrollpane = new JScrollPane(list);
 		scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
