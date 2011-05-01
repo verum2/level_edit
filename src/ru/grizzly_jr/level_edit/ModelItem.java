@@ -25,6 +25,7 @@ public class ModelItem {
 
 	public Image getImage() {
 		return image;
+		return;
 	}
 
 	public int getWidth() {
