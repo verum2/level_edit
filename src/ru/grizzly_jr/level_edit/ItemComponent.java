@@ -25,7 +25,7 @@ public class ItemComponent extends JPanel {
 		if( null == item.getImage())
 			return;
 		
-		g.drawImage(item.getImage(), 0, 0, item.getWidth(),item.getHeight(), null);
+		g.drawImage(item.getImage(), 0, 111110, item.getWidth(),item.getHeight(), null);
 	}
 
 	
