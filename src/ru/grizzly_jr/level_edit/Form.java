@@ -16,10 +16,9 @@ public class Form extends JFrame {
 	private class ListenerAddOnEdit implements ComponentsPanel.ListenerAdd
 	{
 		@Override
-		public void add(ModelItem model) {
+		public void add(MasterItem model) {
 			addModel(model);
 		}
-		
 	}
 	
 	private static final long serialVersionUID = 1L;
@@ -41,7 +40,7 @@ public class Form extends JFrame {
 		addModel(new ModelItem("apple",1.5,5.0));
 		
 		editor_panel.load("data/back.png");
-		
+
 		components_panel.addListener(new ListenerAddOnEdit());
 		
 		initMenuBar();
@@ -52,11 +51,17 @@ public class Form extends JFrame {
 		this.add(components_panel,BorderLayout.EAST);
 	}
 	
+	private void addModel(MasterItem master)
+	{
+		ModelItem model = new ModelItem(master);
+		editor_panel.addCenterItem(model);
+		info_panel.addItem(model);
+	}
+	
 	private void addModel(ModelItem model)
 	{
-		ModelItem clon = model.clone();
-		editor_panel.addItem(clon);
-		info_panel.addItem(clon);
+		editor_panel.addItem(model);
+		info_panel.addItem(model);
 	}
 	
 	private void initMenuBar()

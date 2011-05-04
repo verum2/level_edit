@@ -1,69 +1,64 @@
 package ru.grizzly_jr.level_edit;
 
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.imageio.ImageIO;
-
 public class ModelItem {
-	private static final String path = "data/";
-	public String name;
 	public double x = 0;
 	public double y = 0;
-	public PhysicItem physic = new PhysicItem();
-	
-	private BufferedImage image = null;
-	private double width = 0;
-	private double height = 0;
+
+	private MasterItem master = null;
 	
 	public ModelItem clone()
 	{
-		ModelItem clon = new ModelItem(name,x,y);
-		clon.image = image;
-		clon.width = width;
-		clon.height = height;
-		clon.physic = physic;
+		ModelItem clon = new ModelItem(master,x,y);
 		return clon;
+	}
+	
+	public ModelItem(MasterItem master)
+	{
+		this.master = master;
+	}
+	
+	public ModelItem(MasterItem master,double x,double y)
+	{
+		this.master = master;
+		this.x = x;
+		this.y = y;
 	}
 	
 	public ModelItem(String name)
 	{
-		loadImage(name);
+		master = new MasterItem(name);
 	}
 	
 	public ModelItem(String name,double x,double y)
 	{
 		this.x = x;
 		this.y = y;
-		loadImage(name);
-	}
-	
-	public void loadImage(String name)
-	{
-		try {
-			//TODO: jpg png
-			image = ImageIO.read(new File(path+name+".png"));
-			width = Translate.pixelToMetrs( image.getWidth());
-			height = Translate.pixelToMetrs( image.getHeight());
-			this.name = name;
-		} catch (IOException e) {
-		}
+		master = new MasterItem(name);
 	}
 
 	public Image getImage() {
-		return image;
+		return master.getImage();
+	}
+	
+	public Image getImage(boolean isShape) {
+		return master.getImage(isShape);
 	}
 
 	public double getWidth() {
-		return width;
+		return master.getWidth();
 	}
 
 	public double getHeight() {
-		return height;
+		return master.getHeight();
+	}
+	
+	public MasterItem getMaster()
+	{
+		return master;
 	}
 	
 	public void move(int mx,int my)
@@ -76,8 +71,8 @@ public class ModelItem {
 	{
 		double pxd = Translate.pixelToMetrs(px);
 		double pyd = Translate.pixelToMetrs(py);
-		if( x > pxd || pxd > x+width ||
-			y > pyd || pyd > y+height)
+		if( x > pxd || pxd > x+master.getWidth() ||
+			y > pyd || pyd > y+master.getHeight())
 			return false;
 		return true;
 	}

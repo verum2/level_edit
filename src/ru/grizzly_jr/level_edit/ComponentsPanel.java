@@ -18,14 +18,14 @@ import javax.swing.JTabbedPane;
 public class ComponentsPanel extends JPanel {
 	public interface ListenerAdd
 	{
-		public void add(ModelItem model);
+		public void add(MasterItem model);
 	};
 
 	private static final long serialVersionUID = 1L;
 	
 	private static class Element
 	{
-		public ItemListModel list_model = new ItemListModel();
+		public ItemListMasterModel list_model = new ItemListMasterModel();
 		public JList list = new JList(list_model);
 		public String name;
 		public Element(String name){
@@ -60,10 +60,9 @@ public class ComponentsPanel extends JPanel {
 			tabbed.addTab(iter.name, scrollpane);
 			iter.list.setCellRenderer(new ItemCellRender());
 			
-			iter.list_model.add(new ModelItem("apple"));
-			iter.list_model.add(new ModelItem("apple"));
-			iter.list_model.add(new ModelItem("can"));
-			iter.list_model.add(new ModelItem("apple"));
+
+			iter.list_model.add(new MasterItem("apple"));
+			iter.list_model.add(new MasterItem("can"));
 		}
 		
 		add_button.addActionListener(new ActionListener() {
@@ -123,7 +122,8 @@ public class ComponentsPanel extends JPanel {
 	
 	private void onAdd()
 	{
-		
+		ObjectForm form = new ObjectForm();
+		form.setVisible(true);
 	}
 	
 	private void onEdit()
@@ -139,7 +139,7 @@ public class ComponentsPanel extends JPanel {
 	private void onAddEdit()
 	{
 		for( Element el: elements){
-			for(ModelItem model: el.list_model.getSelectItem()){
+			for(MasterItem model: el.list_model.getSelectItem()){
 				for(ListenerAdd listener: listenersAdd){
 					listener.add(model);
 				}

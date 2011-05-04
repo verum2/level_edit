@@ -10,14 +10,25 @@ public class ItemComponent extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private ModelItem item;
+	private MasterItem master;
 	private boolean isSelect = false;
 	
 	public ItemComponent(ModelItem item)
 	{
 		this.item = item;
+		this.master = item.getMaster();
 		
-		int width = Translate.metrsToPixel(item.getWidth());
-		int height = Translate.metrsToPixel(item.getHeight());
+		int width = Translate.metrsToPixel(master.getWidth());
+		int height = Translate.metrsToPixel(master.getHeight());
+		this.setPreferredSize(new Dimension(width,height+15));
+		this.setSize(width,height+15);
+	}
+	
+	public ItemComponent(MasterItem master)
+	{
+		this.master = master;
+		int width = Translate.metrsToPixel(master.getWidth());
+		int height = Translate.metrsToPixel(master.getHeight());
 		this.setPreferredSize(new Dimension(width,height+15));
 		this.setSize(width,height+15);
 	}
@@ -26,7 +37,7 @@ public class ItemComponent extends JPanel {
 	public void paint(Graphics g) {
 		super.paint(g);
 		
-		if( null == item.getImage())
+		if( null == master.getImage())
 			return;		
 	
 		if( isSelect){
@@ -37,12 +48,14 @@ public class ItemComponent extends JPanel {
 		
 		g.fillRect(0, 0, getWidth(), getHeight());
 		
-		int width = Translate.metrsToPixel(item.getWidth());
-		int height = Translate.metrsToPixel(item.getHeight());
-		g.drawImage(item.getImage(), 0, 0, width,height, null);
+		int width = Translate.metrsToPixel(master.getWidth());
+		int height = Translate.metrsToPixel(master.getHeight());
+		g.drawImage(master.getImage(), 0, 0, width,height, null);
 		
 		g.setColor(new Color(0,0,0));
-		g.drawChars(item.name.toCharArray(), 0, item.name.length(), 0, height+12);
+		
+		String name = master.name;
+		g.drawChars(name.toCharArray(), 0, name.length(), 0, height+12);
 	}
 	
 	public void select(boolean isSelect)

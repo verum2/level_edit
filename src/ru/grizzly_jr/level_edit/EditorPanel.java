@@ -38,6 +38,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	private int scrollX = 0;
 	private int scrollY = 0;
 	private int scrollMouse = 0;
+	private boolean isShaped= false;
 
 	public EditorPanel()
 	{
@@ -87,6 +88,12 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	}
 	
 	public void addItem(ModelItem item)
+	{
+		list.add(item);
+		repaint();
+	}
+	
+	public void addCenterItem(ModelItem item)
 	{
 		list.add(item);
 		Rectangle rec = getRec();
@@ -166,6 +173,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 						return;
 				}
 			
+
 			if( null != item){
 				item.move(x-lastX,y-lastY);
 			}
@@ -177,6 +185,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 					scrollMouse = 0;
 				if(scrollMouse > Translate.metrsToPixel(heightImage)-rec.height)
 					scrollMouse = Translate.metrsToPixel(heightImage)-rec.height;
+
 			}
 			
 			lastY = y;
@@ -258,14 +267,14 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 		
 		private void paintItem(ModelItem item, Graphics g,int xS, int yS)
 		{
-			if( null == item.getImage())
+			if( null == item.getImage(isShaped))
 				return;
 			
 			int w = Translate.metrsToPixel(item.getWidth());
 			int h = Translate.metrsToPixel(item.getHeight());
 			int x = Translate.metrsToPixel(item.x) + xS;
 			int y = Translate.metrsToPixel(item.y) + yS;
-			g.drawImage(item.getImage(),x,y,w,h,null);
+			g.drawImage(item.getImage(isShaped),x,y,w,h,null);
 		}
 	}
 
