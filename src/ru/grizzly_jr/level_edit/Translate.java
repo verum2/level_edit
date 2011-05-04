@@ -3,7 +3,7 @@ package ru.grizzly_jr.level_edit;
 import java.awt.Point;
 
 public class Translate {
-	private static final double SIZE = 100.0;
+	public static double SIZE = 100.0;
 	
 	public static int metrsToPixel(double m)
 	{

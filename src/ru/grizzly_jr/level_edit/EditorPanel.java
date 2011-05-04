@@ -31,6 +31,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	
 	private static final long serialVersionUID = 1L;
 	private BufferedImage image = null;
+	private String name_background;
 	private double widthImage;
 	private double heightImage;
 	private List<ModelItem> list = new ArrayList<ModelItem>();
@@ -64,6 +65,16 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	    ModelItem.addListenerDelete(this);
 	}
 	
+	public void setShaped(boolean isShape)
+	{
+		this.isShaped = isShape;
+	}
+	
+	public boolean isShaped()
+	{
+		return this.isShaped;
+	}
+	
 	public void setResolution(Resolution res)
 	{
 		this.resolution = res;
@@ -75,10 +86,20 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			image = ImageIO.read(new File(path));
 			widthImage = Translate.pixelToMetrs( image.getWidth());
 			heightImage = Translate.pixelToMetrs( image.getHeight());
+			
+			name_background = path;
 			return true;
 		} catch (IOException e) {
 		}
 		return false;
+	}
+	
+	public InformationLevel getInfo()
+	{
+		InformationLevel info = new InformationLevel();
+		info.background = name_background;
+		info.models = list;
+		return info;
 	}
 	
 	public void setItems(List<ModelItem> list)
@@ -96,7 +117,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	public void addCenterItem(ModelItem item)
 	{
 		list.add(item);
-		Rectangle rec = getRec();
+		Rectangle rec = getRec(resolution);
 		double w = Translate.pixelToMetrs(rec.width);
 		double h = Translate.pixelToMetrs(rec.height);
 		double w2 = Translate.pixelToMetrs(this.getWidth());
@@ -116,7 +137,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 		repaint();
 	}
 	
-	private Rectangle getRec()
+	private Rectangle getRec(Resolution resolution)
 	{
 		Rectangle rec = new Rectangle();
 		if( resolution == Resolution.FULL){
@@ -126,14 +147,19 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			rec.y = 10;
 		}else{
 			switch( resolution){
-			case IPAD: rec.width = 1024; rec.height = 768; break;
-			case IPOD: rec.width = 320; rec.height = 480; break;
-			case IPHONE1: rec.width = 320; rec.height = 480; break;
-			case IPHONE2: rec.width = 640; rec.height = 960; break;
+			case IPAD: rec.width = 320; rec.height = 427; Translate.SIZE = 100; break;
+			case IPOD: rec.width = 320; rec.height = 480; Translate.SIZE = 100; break;
+			case IPHONE1: rec.width = 320; rec.height = 480; Translate.SIZE = 100; break;
+			case IPHONE2: rec.width = 320; rec.height = 480; Translate.SIZE = 100; break;
 			}
 			rec.x = (EditorPanel.this.getWidth() - rec.width)/2;
 			rec.y = (EditorPanel.this.getHeight() - rec.height)/2;
 		}
+		if( scrollMouse < 0)
+			scrollMouse = 0;
+		if(scrollMouse > Translate.metrsToPixel(heightImage)-rec.height)
+			scrollMouse = Translate.metrsToPixel(heightImage)-rec.height;
+		
 		return rec;
 	}
 	
@@ -153,7 +179,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			lastY = e.getY();
 			lastX = e.getX();
 			
-			Rectangle rec = getRec();
+			Rectangle rec = getRec(resolution);
 			
 			for( ModelItem it: list){
 				if( it.collisionPoint(lastX-rec.x, lastY-rec.y+scrollMouse)){
@@ -167,7 +193,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			int y = e.getY();
 			int x = e.getX();
 			
-			Rectangle rec = getRec();
+			Rectangle rec = getRec(resolution);
 			if( x < rec.x || x > rec.x + rec.width ||
 				y < rec.y || y > rec.y + rec.height){
 						return;
@@ -216,13 +242,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			int x = 0;
 			int y = 0;
 			
-			Rectangle rec = new Rectangle();
-			switch( resolution){
-			case IPAD: rec.width = 1024; rec.height = 768; break;
-			case IPOD: rec.width = 320; rec.height = 480; break;
-			case IPHONE1: rec.width = 320; rec.height = 480; break;
-			case IPHONE2: rec.width = 640; rec.height = 960; break;
-			}
+			Rectangle rec = getRec(resolution);
 			
 			int ww = Math.max(rec.width, EditorPanel.this.getWidth());
 			int hh = Math.max(rec.height, EditorPanel.this.getHeight());
@@ -242,6 +262,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 				if( y < 0)
 					y = 0;
 				y -= scrollMouse;
+				
 				g.clipRect(rec.x, rec.y, rec.width, rec.height);
 				
 				ww = Math.max(rec.width, EditorPanel.this.getWidth()-20);
@@ -270,8 +291,8 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			if( null == item.getImage(isShaped))
 				return;
 			
-			int w = Translate.metrsToPixel(item.getWidth());
-			int h = Translate.metrsToPixel(item.getHeight());
+			int w = Translate.metrsToPixel(item.getWidth(isShaped));
+			int h = Translate.metrsToPixel(item.getHeight(isShaped));
 			int x = Translate.metrsToPixel(item.x) + xS;
 			int y = Translate.metrsToPixel(item.y) + yS;
 			g.drawImage(item.getImage(isShaped),x,y,w,h,null);

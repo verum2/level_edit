@@ -19,6 +19,8 @@ public class MasterItem {
 	private BufferedImage imageWithShapes = null;
 	private double width = 0;
 	private double height = 0;
+	private double width_shape = 0;
+	private double height_shape = 0;
 	
 	public MasterItem(String name)
 	{
@@ -31,6 +33,8 @@ public class MasterItem {
 			image = ImageIO.read(new File(path+name+".png"));
 			width = Translate.pixelToMetrs( image.getWidth());
 			height = Translate.pixelToMetrs( image.getHeight());
+			width_shape = width;
+			height_shape = height;
 			this.name = name;
 			redrawImageWithShapes();
 		} catch (IOException e) {
@@ -40,19 +44,22 @@ public class MasterItem {
 
 	public void redrawImageWithShapes()
 	{
-		
 		ColorModel cm = image.getColorModel();
 		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
 		WritableRaster raster = image.copyData(null);
-		imageWithShapes=new BufferedImage(cm, raster,
+		imageWithShapes = new BufferedImage(cm, raster,
 				isAlphaPremultiplied, null);
 		
 		for (ShapePolygon shapePolygon : physic.getPolygonList()) {
+			shapePolygon.setRadius(0);
 			shapePolygon.draw(imageWithShapes.createGraphics(),true);
 		}
 		for (ShapeCircle shapeCircle : physic.getCircleList()) {
 			shapeCircle.draw(imageWithShapes.createGraphics());
 		}
+		
+		width_shape = Translate.pixelToMetrs( imageWithShapes.getWidth());
+		height_shape = Translate.pixelToMetrs( imageWithShapes.getHeight());
 			
 	}
 	
@@ -66,6 +73,20 @@ public class MasterItem {
 
 	public Image getImage() {
 		return image;
+	}
+	
+	public double getWidth(boolean isShaped) {
+		if( isShaped){
+			return width_shape;
+		}
+		return width;
+	}
+
+	public double getHeight(boolean isShaped) {
+		if( isShaped){
+			return height_shape;
+		}
+		return height;
 	}
 
 	public double getWidth() {

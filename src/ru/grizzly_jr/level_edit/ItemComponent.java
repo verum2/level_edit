@@ -56,6 +56,11 @@ public class ItemComponent extends JPanel {
 		
 		String name = master.name;
 		g.drawChars(name.toCharArray(), 0, name.length(), 0, height+12);
+		
+		if( null != item){
+			String id = Integer.toString(item.getId());
+			g.drawChars(id.toCharArray(), 0, id.length(), getWidth()-30, height+12);
+		}
 	}
 	
 	public void select(boolean isSelect)

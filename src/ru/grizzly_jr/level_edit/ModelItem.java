@@ -8,7 +8,9 @@ public class ModelItem {
 	public double x = 0;
 	public double y = 0;
 
-	private MasterItem master = null;
+	private MasterItem master = null;	
+	private int id = 0;
+	private static int id_static = 1;
 	
 	public ModelItem clone()
 	{
@@ -19,6 +21,7 @@ public class ModelItem {
 	public ModelItem(MasterItem master)
 	{
 		this.master = master;
+		setId();
 	}
 	
 	public ModelItem(MasterItem master,double x,double y)
@@ -26,11 +29,13 @@ public class ModelItem {
 		this.master = master;
 		this.x = x;
 		this.y = y;
+		setId();
 	}
 	
 	public ModelItem(String name)
 	{
 		master = new MasterItem(name);
+		setId();
 	}
 	
 	public ModelItem(String name,double x,double y)
@@ -38,8 +43,14 @@ public class ModelItem {
 		this.x = x;
 		this.y = y;
 		master = new MasterItem(name);
+		setId();
 	}
 
+	public int getId()
+	{
+		return id;
+	}
+	
 	public Image getImage() {
 		return master.getImage();
 	}
@@ -54,6 +65,14 @@ public class ModelItem {
 
 	public double getHeight() {
 		return master.getHeight();
+	}
+	
+	public double getWidth(boolean isShaped) {
+		return master.getWidth(isShaped);
+	}
+
+	public double getHeight(boolean isShaped) {
+		return master.getHeight(isShaped);
 	}
 	
 	public MasterItem getMaster()
@@ -75,6 +94,11 @@ public class ModelItem {
 			y > pyd || pyd > y+master.getHeight())
 			return false;
 		return true;
+	}
+
+	private void setId()
+	{
+		id = id_static++;
 	}
 	
 	public static interface isDelete

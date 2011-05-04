@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -21,15 +22,14 @@ public class ObjectForm extends JDialog {
 	private PaintSheet sheet_panel;
 	private JMenuBar menubar = new JMenuBar();
 	private Box shapeInfo;
-	private MasterItem masterItem;
+	public MasterItem masterItem;
 	JPanel info_panel;
 	
-	public ObjectForm()
+	public ObjectForm(JFrame parent)
 	{
-		super();
+		super(parent);
 		this.setLayout(new BorderLayout());
 		this.setSize(600, 400);
-		
 		
 		initMenuBar();
 		this.setJMenuBar(menubar);
@@ -40,8 +40,6 @@ public class ObjectForm extends JDialog {
 		shapeInfo = Box.createVerticalBox();
 		
 		info_panel.add(shapeInfo,BorderLayout.WEST);
-		JLabel jLab = new JLabel("Shape xyi");
-		shapeInfo.add(jLab);
 		
 		masterItem= new MasterItem("apple");
 		sheet_panel = new PaintSheet(masterItem);
@@ -132,7 +130,7 @@ public class ObjectForm extends JDialog {
 	
 	private void onExit()
 	{
-		System.exit(0);
+		setVisible(false);
 	}
 	
 }

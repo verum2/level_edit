@@ -10,6 +10,8 @@ public class ShapePolygon {
 	
 	private List<PointD> points = null;
 	private Color lineColor;
+	private int radius = 5;
+	
 	
 	public ShapePolygon(Color lineColor) {
 		super();
@@ -17,6 +19,9 @@ public class ShapePolygon {
 		points = new ArrayList<PointD>();
 	}
 
+	public void setRadius(int r){
+		this.radius = r;
+	}
 	
 	public void addPoint(PointD point) {
 		points.add(point);
@@ -42,7 +47,6 @@ public class ShapePolygon {
 		Point PreviousPoint = null;
 		for (PointD pd : points) {
 			Point p = Translate.pointMetrsToPixelWithZoom(pd, 1);
-			int radius=5;
 			g.fillOval(p.x - (int) radius, p.y
 					- (int) radius,
 					(int) radius * 2,
