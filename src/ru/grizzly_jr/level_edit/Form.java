@@ -3,8 +3,6 @@ package ru.grizzly_jr.level_edit;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -12,15 +10,23 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JSeparator;
 
-public class Form extends JFrame {
+import ru.grizzly_jr.level_edit.EditorPanel.Resolution;
 
+public class Form extends JFrame {
+	private class ListenerAddOnEdit implements ComponentsPanel.ListenerAdd
+	{
+		@Override
+		public void add(ModelItem model) {
+			addModel(model);
+		}
+		
+	}
+	
 	private static final long serialVersionUID = 1L;
 	private EditorPanel editor_panel = new EditorPanel();
 	private InformationPanel info_panel = new InformationPanel();
 	private ComponentsPanel components_panel = new ComponentsPanel();
 	private JMenuBar menubar = new JMenuBar();
-	
-	private List<ModelItem> models = new ArrayList<ModelItem>();
 	
 	public Form()
 	{
@@ -36,6 +42,8 @@ public class Form extends JFrame {
 		
 		editor_panel.load("data/back.png");
 		
+		components_panel.addListener(new ListenerAddOnEdit());
+		
 		initMenuBar();
 		this.setJMenuBar(menubar);
 		
@@ -46,22 +54,9 @@ public class Form extends JFrame {
 	
 	private void addModel(ModelItem model)
 	{
-		models.add(model);
-		editor_panel.addItem(model);
-		info_panel.addItem(model);
-	}
-	
-	private void removeModel(ModelItem model)
-	{
-		models.remove(model);
-		editor_panel.removeItem(model);
-		editor_panel.removeItem(model);
-	}
-	
-	private void setModels()
-	{
-		editor_panel.setItems(models);
-		info_panel.setItems(models);
+		ModelItem clon = model.clone();
+		editor_panel.addItem(clon);
+		info_panel.addItem(clon);
 	}
 	
 	private void initMenuBar()
@@ -100,6 +95,33 @@ public class Form extends JFrame {
 		file.add(loadI);
 		file.add(new JSeparator());
 		file.add(exitI);
+		
+		//setting
+		JMenuItem fullI = new JMenuItem("FULL");
+		JMenuItem ipadI = new JMenuItem("IPAD");
+		JMenuItem ipodI = new JMenuItem("IPOD");
+		JMenuItem iphoneI = new JMenuItem("IPHONE");
+		fullI.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				editor_panel.setResolution(Resolution.FULL);
+			}});
+		ipadI.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				editor_panel.setResolution(Resolution.IPAD);
+			}});
+		ipodI.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				editor_panel.setResolution(Resolution.IPOD);
+			}});
+		iphoneI.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				editor_panel.setResolution(Resolution.IPHONE2);
+			}});
+		
+		setting.add(fullI);
+		setting.add(ipadI);
+		setting.add(ipodI);
+		setting.add(iphoneI);
 	}
 	
 	private void onNew()

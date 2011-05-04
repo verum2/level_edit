@@ -4,6 +4,8 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -17,6 +19,16 @@ public class ModelItem {
 	private BufferedImage image = null;
 	private double width = 0;
 	private double height = 0;
+	
+	public ModelItem clone()
+	{
+		ModelItem clon = new ModelItem(name,x,y);
+		clon.image = image;
+		clon.width = width;
+		clon.height = height;
+		clon.physic = physic;
+		return clon;
+	}
 	
 	public ModelItem(String name)
 	{
@@ -52,5 +64,41 @@ public class ModelItem {
 
 	public double getHeight() {
 		return height;
+	}
+	
+	public void move(int mx,int my)
+	{
+		x += Translate.pixelToMetrs(mx);
+		y += Translate.pixelToMetrs(my);
+	}
+	
+	public boolean collisionPoint(int px,int py)
+	{
+		double pxd = Translate.pixelToMetrs(px);
+		double pyd = Translate.pixelToMetrs(py);
+		if( x > pxd || pxd > x+width ||
+			y > pyd || pyd > y+height)
+			return false;
+		return true;
+	}
+	
+	public static interface isDelete
+	{
+		public void delete(ModelItem model);
+	};
+	private static List<isDelete> listenerDelete = new ArrayList<isDelete>();
+	
+	public static void addListenerDelete(isDelete del){
+		listenerDelete.add(del);
+	}
+	
+	public static void removeListenerDelete(isDelete del){
+		listenerDelete.remove(del);
+	}
+	
+	public static void executeDelete( ModelItem model){
+		for( isDelete listener: listenerDelete){
+			listener.delete(model);
+		}
 	}
 }

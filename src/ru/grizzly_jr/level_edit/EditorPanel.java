@@ -1,11 +1,14 @@
 package ru.grizzly_jr.level_edit;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +19,7 @@ import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-public class EditorPanel extends JPanel {
+public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	public enum Resolution
 	{
 		IPAD,
@@ -28,12 +31,13 @@ public class EditorPanel extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
 	private BufferedImage image = null;
-	private double width;
-	private double height;
+	private double widthImage;
+	private double heightImage;
 	private List<ModelItem> list = new ArrayList<ModelItem>();
-	private Resolution resolution = Resolution.FULL;
+	private Resolution resolution = Resolution.IPOD;
 	private int scrollX = 0;
 	private int scrollY = 0;
+	private int scrollMouse = 0;
 
 	public EditorPanel()
 	{
@@ -55,14 +59,21 @@ public class EditorPanel extends JPanel {
 			}});
 		
 	    add(scrollpane, BorderLayout.CENTER);
+	    
+	    ModelItem.addListenerDelete(this);
+	}
+	
+	public void setResolution(Resolution res)
+	{
+		this.resolution = res;
 	}
 	
 	public boolean load(String path)
 	{
 		try {
 			image = ImageIO.read(new File(path));
-			width = Translate.pixelToMetrs( image.getWidth());
-			height = Translate.pixelToMetrs( image.getHeight());
+			widthImage = Translate.pixelToMetrs( image.getWidth());
+			heightImage = Translate.pixelToMetrs( image.getHeight());
 			return true;
 		} catch (IOException e) {
 		}
@@ -78,6 +89,17 @@ public class EditorPanel extends JPanel {
 	public void addItem(ModelItem item)
 	{
 		list.add(item);
+		Rectangle rec = getRec();
+		double w = Translate.pixelToMetrs(rec.width);
+		double h = Translate.pixelToMetrs(rec.height);
+		double w2 = Translate.pixelToMetrs(this.getWidth());
+		double h2 = Translate.pixelToMetrs(this.getHeight());
+		double x = Translate.pixelToMetrs(scrollX);
+		double y = Translate.pixelToMetrs(scrollY+scrollMouse);
+		
+		item.x = x + Math.min(w,w2)/2.0;
+		item.y = y + Math.min(h,h2)/2.0;
+		
 		repaint();
 	}
 	
@@ -87,17 +109,101 @@ public class EditorPanel extends JPanel {
 		repaint();
 	}
 	
+	private Rectangle getRec()
+	{
+		Rectangle rec = new Rectangle();
+		if( resolution == Resolution.FULL){
+			rec.width = Translate.metrsToPixel(widthImage);
+			rec.height = Translate.metrsToPixel(heightImage);
+			rec.x = (EditorPanel.this.getWidth() - rec.width)/2;
+			rec.y = 10;
+		}else{
+			switch( resolution){
+			case IPAD: rec.width = 1024; rec.height = 768; break;
+			case IPOD: rec.width = 320; rec.height = 480; break;
+			case IPHONE1: rec.width = 320; rec.height = 480; break;
+			case IPHONE2: rec.width = 640; rec.height = 960; break;
+			}
+			rec.x = (EditorPanel.this.getWidth() - rec.width)/2;
+			rec.y = (EditorPanel.this.getHeight() - rec.height)/2;
+		}
+		return rec;
+	}
+	
+	private class Mouse extends MouseAdapter
+	{
+		private int lastY = 0;
+		private int lastX = 0;
+		private ModelItem item = null;
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			item = null;
+		}
+		
+		@Override
+		public void mousePressed(MouseEvent e) {
+			lastY = e.getY();
+			lastX = e.getX();
+			
+			Rectangle rec = getRec();
+			
+			for( ModelItem it: list){
+				if( it.collisionPoint(lastX-rec.x, lastY-rec.y+scrollMouse)){
+					item = it;
+				}
+			}
+		}
+
+		@Override
+		public void mouseDragged(MouseEvent e) {			
+			int y = e.getY();
+			int x = e.getX();
+			
+			Rectangle rec = getRec();
+			if( x < rec.x || x > rec.x + rec.width ||
+				y < rec.y || y > rec.y + rec.height){
+						return;
+				}
+			
+			if( null != item){
+				item.move(x-lastX,y-lastY);
+			}
+			
+			if( resolution != Resolution.FULL && null == item)
+			{				
+				scrollMouse += lastY - y;
+				if( scrollMouse < 0)
+					scrollMouse = 0;
+				if(scrollMouse > Translate.metrsToPixel(heightImage)-rec.height)
+					scrollMouse = Translate.metrsToPixel(heightImage)-rec.height;
+			}
+			
+			lastY = y;
+			lastX = x;
+			repaint();
+		}		
+	}
+	
 	private class PanelPaint extends JPanel
 	{
 		private static final long serialVersionUID = 1L;
 
+		public PanelPaint()
+		{
+			super();
+			Mouse mouse = new Mouse();
+			this.addMouseMotionListener(mouse);
+			this.addMouseListener(mouse);
+		}
+		
 		@Override
 		public void paint(Graphics g) {
 			if( null == image)
 				return;
 			
-			int w = Translate.metrsToPixel(width);
-			int h = Translate.metrsToPixel(height);
+			int w = Translate.metrsToPixel(widthImage);
+			int h = Translate.metrsToPixel(heightImage);
 			int x = 0;
 			int y = 0;
 			
@@ -109,6 +215,13 @@ public class EditorPanel extends JPanel {
 			case IPHONE2: rec.width = 640; rec.height = 960; break;
 			}
 			
+			int ww = Math.max(rec.width, EditorPanel.this.getWidth());
+			int hh = Math.max(rec.height, EditorPanel.this.getHeight());
+			ww = Math.max(ww, w);
+			hh = Math.max(hh, h);
+			g.setColor(new Color(127,127,127));
+			g.fillRect(0, 0, ww, hh);
+			
 			if( resolution != Resolution.FULL)
 			{
 				x = (EditorPanel.this.getWidth() - rec.width)/2;
@@ -119,16 +232,20 @@ public class EditorPanel extends JPanel {
 					x = 0;
 				if( y < 0)
 					y = 0;
-				
+				y -= scrollMouse;
 				g.clipRect(rec.x, rec.y, rec.width, rec.height);
-				this.setSize(Math.max(rec.width,w),Math.max(rec.height,h));
-				this.setPreferredSize(new Dimension(Math.max(rec.width,w),Math.max(rec.height,h)));
+				
+				ww = Math.max(rec.width, EditorPanel.this.getWidth()-20);
+				hh = Math.max(rec.height, EditorPanel.this.getHeight()-20);
+				
+				this.setSize(ww,hh);
+				this.setPreferredSize(new Dimension(rec.width,rec.height));
 			}else{
 				x = (EditorPanel.this.getWidth() - w)/2;
 				y = 10;
 				rec.x = x;
 				rec.y = y;
-				this.setSize(w, h);
+				this.setSize(ww, hh);
 				this.setPreferredSize(new Dimension(w,h));
 			}
 			
@@ -150,6 +267,11 @@ public class EditorPanel extends JPanel {
 			int y = Translate.metrsToPixel(item.y) + yS;
 			g.drawImage(item.getImage(),x,y,w,h,null);
 		}
+	}
+
+	@Override
+	public void delete(ModelItem model) {
+		removeItem(model);
 	}
 	
 	
