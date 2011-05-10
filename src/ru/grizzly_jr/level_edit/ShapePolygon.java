@@ -10,8 +10,6 @@ public class ShapePolygon {
 	
 	private List<PointD> points = null;
 	private Color lineColor;
-	private int radius = 5;
-	
 	
 	public ShapePolygon(Color lineColor) {
 		super();
@@ -19,9 +17,6 @@ public class ShapePolygon {
 		points = new ArrayList<PointD>();
 	}
 
-	public void setRadius(int r){
-		this.radius = r;
-	}
 	
 	public void addPoint(PointD point) {
 		points.add(point);
@@ -47,6 +42,7 @@ public class ShapePolygon {
 		Point PreviousPoint = null;
 		for (PointD pd : points) {
 			Point p = Translate.pointMetrsToPixelWithZoom(pd, 1);
+			int radius=5;
 			g.fillOval(p.x - (int) radius, p.y
 					- (int) radius,
 					(int) radius * 2,
@@ -64,7 +60,7 @@ public class ShapePolygon {
 		g.drawLine(fp.x,fp.y,ep.x,ep.y);
 		}
 	}
-	public void drawWithZoom(Graphics2D g,boolean isFinished,double zoom) {
+	public void drawWithZoom(Graphics2D g,boolean isFinished,double zoom,Point move) {
 		/*
 		BasicStroke stroke = new BasicStroke((float) lineOptions.getThick(),
 				BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
@@ -76,13 +72,13 @@ public class ShapePolygon {
 		for (PointD pd : points) {
 			Point p = Translate.pointMetrsToPixelWithZoom(pd, zoom);
 			int radius=5;
-			g.fillOval(p.x - (int) radius, p.y
-					- (int) radius,
+			g.fillOval(p.x - (int) radius + move.x, p.y
+					- (int) radius + move.y,
 					(int) radius * 2,
 					(int) radius * 2);
 
 			if (null != PreviousPoint) {
-				g.drawLine(PreviousPoint.x, PreviousPoint.y, p.x, p.y);
+				g.drawLine(PreviousPoint.x + move.x, PreviousPoint.y + move.y, p.x + move.x, p.y + move.y);
 			}
 			PreviousPoint = p;
 		}
@@ -90,7 +86,7 @@ public class ShapePolygon {
 		{
 			Point fp= Translate.pointMetrsToPixelWithZoom(points.get(0), zoom);
 			Point ep= Translate.pointMetrsToPixelWithZoom(points.get(points.size()-1), zoom);
-		g.drawLine(fp.x,fp.y,ep.x,ep.y);
+		g.drawLine(fp.x + move.x,fp.y + move.y,ep.x + move.x,ep.y + move.y);
 		}
 	}
 	

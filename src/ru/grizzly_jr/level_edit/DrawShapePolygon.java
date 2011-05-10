@@ -2,6 +2,7 @@ package ru.grizzly_jr.level_edit;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Point;
 
 /**
  * Класс хранит данные о рисующейся в данный момент полилинии и способен ее
@@ -38,9 +39,9 @@ public class DrawShapePolygon {
 		return shapePolygon;
 	}
 
-	public void draw(Graphics2D g,double zoom) {
+	public void draw(Graphics2D g,double zoom, Point move) {
 
-		shapePolygon.drawWithZoom(g,false,zoom);
+		shapePolygon.drawWithZoom(g,false,zoom,move);
 		/*
 		BasicStroke stroke = new BasicStroke((float) lineOptions.getThick(),
 				BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
@@ -48,8 +49,9 @@ public class DrawShapePolygon {
 		g.setStroke(stroke);
 */
 		g.setColor(lineColor);
-
-		g.drawLine(Translate.metrsToPixelWithZoom(LastPoint.getX(), zoom), Translate.metrsToPixelWithZoom(LastPoint.getY(), zoom), Translate.metrsToPixelWithZoom(ActivePoint.getX(), zoom), Translate.metrsToPixelWithZoom(ActivePoint.getY(), zoom));
-	}
+		Point fp= Translate.pointMetrsToPixelWithZoom(LastPoint, zoom);
+		Point ep= Translate.pointMetrsToPixelWithZoom(ActivePoint, zoom);
+		g.drawLine(fp.x + move.x,fp.y + move.y,ep.x + move.x,ep.y + move.y);
+		}
 
 }

@@ -59,11 +59,12 @@ public class PaintSheet extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private BufferedImage bufferImage = null;
 	//private List<PolyLine> polyLines = null;
+	private Point imagePos;
 	private DrawShapePolygon lastPolygon = null;
 	private ShapeCircle lastCircle = null;
 	private MasterItem masterItem = null;
 	private Timer getMousePositionTimer;
-	private DrawShapeType currentShapeType = DrawShapeType.Polygon;
+	private DrawShapeType currentShapeType = DrawShapeType.Circle;
 	private double zoom=2;
 	
 	/**
@@ -79,6 +80,7 @@ public class PaintSheet extends JPanel {
 	public PaintSheet(MasterItem master) {
 		super();
 		this.masterItem = master;
+		correctSize();
 		
 		addMouseListener(new MouseAdapter() {
 			@Override
@@ -89,14 +91,14 @@ public class PaintSheet extends JPanel {
 					
 					if (null == PaintSheet.this.lastPolygon) {
 						int ShapeCount = PaintSheet.this.masterItem.physic.getPolygonList().size()+PaintSheet.this.masterItem.physic.getCircleList().size();
-						PaintSheet.this.lastPolygon = new DrawShapePolygon(Translate.pointPixelToMetrsWithZoom(new Point(e.getX(), e.getY()), zoom) ,ShapeColor[ShapeCount%ShapeColor.length]);
+						PaintSheet.this.lastPolygon = new DrawShapePolygon(Translate.pointPixelToMetrsWithZoom(new Point(e.getX()-imagePos.x, e.getY()-imagePos.y), zoom) ,ShapeColor[ShapeCount%ShapeColor.length]);
 						PaintSheet.this.repaint();
 						for (ListenerActiveLine iter : listeners) {
 							iter.Active();
 						}
 					} else {
 						PaintSheet.this.lastPolygon.addPoint(Translate.pointPixelToMetrsWithZoom(new Point(e
-								.getX(), e.getY()),zoom));
+								.getX()-imagePos.x, e.getY()-imagePos.y),zoom));
 						PaintSheet.this.repaint();
 					}
 					
@@ -104,7 +106,7 @@ public class PaintSheet extends JPanel {
 				if (MouseEvent.BUTTON3 == e.getButton()) {
 					if (null != PaintSheet.this.lastPolygon) {
 						PaintSheet.this.lastPolygon.addPoint(Translate.pointPixelToMetrsWithZoom(new Point(e
-								.getX(), e.getY()),zoom));
+								.getX()-imagePos.x, e.getY()-imagePos.y),zoom));
 						PaintSheet.this.masterItem.physic.getPolygonList().add(PaintSheet.this.lastPolygon.getShapePolygon());
 						PaintSheet.this.lastPolygon = null;
 						for (ListenerActiveLine iter : listeners) {
@@ -121,7 +123,7 @@ public class PaintSheet extends JPanel {
 					{
 						int ShapeCount = PaintSheet.this.masterItem.physic.getPolygonList().size()+PaintSheet.this.masterItem.physic.getCircleList().size();
 						PaintSheet.this.lastCircle = new ShapeCircle(Translate.pointPixelToMetrsWithZoom(new Point(e
-								.getX(), e.getY()),zoom),0,ShapeColor[ShapeCount%ShapeColor.length]);
+								.getX()-imagePos.x, e.getY()-imagePos.y),zoom),0,ShapeColor[ShapeCount%ShapeColor.length]);
 						PaintSheet.this.repaint();
 						for (ListenerActiveLine iter : listeners) {
 							iter.Active();
@@ -166,7 +168,7 @@ public class PaintSheet extends JPanel {
 						par = par.getParent();
 					}
 					
-					Point mouseClickPos =  new Point((int)MouseInfo.getPointerInfo().getLocation().getX()-position.x,(int)MouseInfo.getPointerInfo().getLocation().getY()-position.y);
+					Point mouseClickPos =  new Point((int)MouseInfo.getPointerInfo().getLocation().getX()-position.x-imagePos.x,(int)MouseInfo.getPointerInfo().getLocation().getY()-position.y-imagePos.y);
 					if (null != PaintSheet.this.lastPolygon)
 					{
 					PaintSheet.this.lastPolygon.move(Translate.pointPixelToMetrsWithZoom(mouseClickPos, zoom));
@@ -176,7 +178,7 @@ public class PaintSheet extends JPanel {
 					{
 						Point ccentr = Translate.pointMetrsToPixelWithZoom(PaintSheet.this.lastCircle.getCenter(),zoom) ;
 						double newRadius= Math.sqrt((mouseClickPos.getX()-ccentr.getX())*(mouseClickPos.getX()-ccentr.getX())+(mouseClickPos.getY()-ccentr.getY())*(mouseClickPos.getY()-ccentr.getY()));
-						PaintSheet.this.lastCircle.setRadius(newRadius);
+						PaintSheet.this.lastCircle.setRadius(Translate.pixelToMetrsWithZoom((int)newRadius, zoom));
 					}
 					
 					PaintSheet.this.repaint();
@@ -196,23 +198,14 @@ public class PaintSheet extends JPanel {
 		listeners.add(listener);
 	}
 
-	/**
-	 * Устанавливает новый список полилиний
-	 * 
-	 * @param polyLines
-	 *            список полилиний
-	 */
-/*
-	public void setPolyLines(List<PolyLine> polyLines) {
-		this.polyLines = polyLines;
+	public void correctSize()
+	{
+		//setSize(new Dimension(10,10));
+		setPreferredSize(new Dimension(Translate.metrsToPixel(masterItem.getWidth()),Translate.metrsToPixel(masterItem.getHeight())));
+		setSize(new Dimension(Translate.metrsToPixel(masterItem.getWidth()),Translate.metrsToPixel(masterItem.getHeight())));
 	}
-*/
 	
-	/**
-	 * Возвращает текущий список полилиний
-	 * 
-	 * @return текущий список полилиний
-	 */
+	
 	public List<ShapePolygon> getShapePolygon() {
 		return masterItem.physic.getPolygonList();
 	}
@@ -223,16 +216,23 @@ public class PaintSheet extends JPanel {
 	public void repaintImage() {
 
 		Dimension Size = getSize();
+		imagePos = new Point((Size.width-Translate.metrsToPixelWithZoom(masterItem.getWidth(), zoom))/2,(Size.height-Translate.metrsToPixelWithZoom(masterItem.getHeight(),zoom))/2);
 		masterItem.redrawImageWithShapes();
 		bufferImage = new BufferedImage(Size.width, Size.height,
 				BufferedImage.TYPE_INT_ARGB);
 		Graphics g = bufferImage.createGraphics();
 		g.setColor(new Color(255,255,255));
 		g.fillRect(0, 0, Size.width, Size.height);
-		g.drawImage(masterItem.getImage(false), 1, 1, (int)(masterItem.getImage(false).getWidth()*zoom),
+		g.drawImage(masterItem.getImage(false), imagePos.x, imagePos.y, (int)(masterItem.getImage(false).getWidth()*zoom),
 				(int)(masterItem.getImage(false).getHeight()*zoom), this);
+		g.setColor(new Color(0,0,0));
+		g.drawRect(imagePos.x-1, imagePos.y-1, (int)(masterItem.getImage(false).getWidth()*zoom)+2,
+				(int)(masterItem.getImage(false).getHeight()*zoom)+2);
 		for (ShapePolygon shapePolygon : masterItem.physic.getPolygonList()) {
-			shapePolygon.drawWithZoom(bufferImage.createGraphics(),true,zoom);
+			shapePolygon.drawWithZoom(bufferImage.createGraphics(),true,zoom,imagePos);
+		}
+		for (ShapeCircle shapeCircle :  masterItem.physic.getCircleList()) {
+			shapeCircle.drawWithZoom(bufferImage.createGraphics(),zoom,imagePos);
 		}
 		repaint();
 	}
@@ -246,10 +246,10 @@ public class PaintSheet extends JPanel {
 		}
 		g.drawImage(bufferImage, 0, 0, this);
 		if (null != lastPolygon) {
-			lastPolygon.draw((Graphics2D) g,zoom);
+			lastPolygon.draw((Graphics2D) g,zoom, imagePos);
 		}
 		if (null != lastCircle) {
-			lastCircle.draw((Graphics2D) g);
+			lastCircle.drawWithZoom((Graphics2D) g,zoom,imagePos);
 		}
 
 	}

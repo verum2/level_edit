@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -22,14 +21,15 @@ public class ObjectForm extends JDialog {
 	private PaintSheet sheet_panel;
 	private JMenuBar menubar = new JMenuBar();
 	private Box shapeInfo;
-	public MasterItem masterItem;
+	private MasterItem masterItem;
 	JPanel info_panel;
 	
-	public ObjectForm(JFrame parent)
+	public ObjectForm()
 	{
-		super(parent);
+		super();
 		this.setLayout(new BorderLayout());
 		this.setSize(600, 400);
+		
 		
 		initMenuBar();
 		this.setJMenuBar(menubar);
@@ -40,8 +40,11 @@ public class ObjectForm extends JDialog {
 		shapeInfo = Box.createVerticalBox();
 		
 		info_panel.add(shapeInfo,BorderLayout.WEST);
+		JLabel jLab = new JLabel("Shape xyi");
+		shapeInfo.add(jLab);
 		
 		masterItem= new MasterItem("apple");
+		
 		sheet_panel = new PaintSheet(masterItem);
 		
 		sheet_panel.addListener(new PaintSheet.ListenerActiveLine() {
@@ -63,6 +66,18 @@ public class ObjectForm extends JDialog {
 						jLab = new JLabel(points);
 						shapeInfo.add(jLab);
 					}
+					shapeIndex++;
+				}
+				shapeIndex = 1;
+				for (ShapeCircle shapeCircle : masterItem.physic.getCircleList()) {
+					JLabel jLab = new JLabel("Shape "+shapeIndex.toString());
+					shapeInfo.add(jLab);													
+						Double x = shapeCircle.getCenter().getX();
+						Double y = shapeCircle.getCenter().getY();
+						Double r =shapeCircle.getRadius();
+						String points = "("+x.toString()+","+y.toString()+") r: "+r;
+						jLab = new JLabel(points);
+						shapeInfo.add(jLab);
 					shapeIndex++;
 				}
 				ObjectForm.this.info_panel.updateUI();
@@ -130,7 +145,7 @@ public class ObjectForm extends JDialog {
 	
 	private void onExit()
 	{
-		setVisible(false);
+		System.exit(0);
 	}
 	
 }

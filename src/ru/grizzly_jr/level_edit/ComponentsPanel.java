@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -44,12 +43,9 @@ public class ComponentsPanel extends JPanel {
 	
 	private List<ListenerAdd> listenersAdd = new ArrayList<ListenerAdd>();
 	
-	private JFrame parent;
-	
-	public ComponentsPanel(JFrame parent)
+	public ComponentsPanel()
 	{
 		super(new BorderLayout());
-		this.parent = parent;
 		setPreferredSize(new Dimension(240,480));
 		
 		elements.add(new Element("box"));
@@ -114,63 +110,6 @@ public class ComponentsPanel extends JPanel {
 		this.add(panel,BorderLayout.SOUTH);
 	}
 	
-	public void addItem(MasterItem item,int index)
-	{
-		if( index < 0 || index >= elements.size())
-			return;
-		
-		Element el = elements.get(index);
-		el.list_model.add(item);
-		el.list.setCellRenderer(new ItemCellRender());
-		repaint();
-	}
-	
-	public void removeItem(MasterItem item,int index)
-	{
-		if( index < 0 || index >= elements.size())
-			return;
-		
-		Element el = elements.get(index);
-		el.list_model.remove(item);
-		el.list.setCellRenderer(new ItemCellRender());
-		repaint();
-	}
-	
-	public void set(InformationModel model)
-	{
-		elements.clear();
-		tabbed.removeAll();
-		do{
-			InformationModel.Element it = model.getElement();
-			Element el = new Element(it.name);
-			elements.add(el);
-			
-			JScrollPane scrollpane = new JScrollPane(el.list);
-			scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-			scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-			
-			tabbed.addTab(el.name, scrollpane);
-			el.list.setCellRenderer(new ItemCellRender());
-			for( MasterItem item: it.items){
-				el.list_model.add(item);
-			}
-			
-		}while(model.next());
-	}
-	
-	public InformationModel getInfo()
-	{
-		List<InformationModel.Element> list = new ArrayList<InformationModel.Element>();
-		for( Element el:elements)
-		{
-			InformationModel.Element element = new InformationModel.Element();
-			element.name = el.name;
-			element.items = el.list_model.getItems();
-			list.add(element);
-		}
-		return new InformationModel(list);
-	}
-	
 	public void addListener(ListenerAdd listener)
 	{
 		listenersAdd.add(listener);
@@ -183,9 +122,8 @@ public class ComponentsPanel extends JPanel {
 	
 	private void onAdd()
 	{
-		ObjectForm form = new ObjectForm(parent);
+		ObjectForm form = new ObjectForm();
 		form.setVisible(true);
-		addItem(form.masterItem,0);
 	}
 	
 	private void onEdit()
@@ -195,13 +133,7 @@ public class ComponentsPanel extends JPanel {
 	
 	private void onRemove()
 	{
-		for( Element el: elements){
-			el.list_model.onRemove();
-		}
-		for( Element el: elements){
-			el.list.setCellRenderer(new ItemCellRender());
-		}
-		repaint();
+		
 	}
 	
 	private void onAddEdit()

@@ -28,11 +28,6 @@ private static final long serialVersionUID = 1L;
 		}
 	}
 	
-	public List<MasterItem> getItems()
-	{
-		return objects;
-	}
-	
 	public List<MasterItem> getSelectItem()
 	{
 		List<MasterItem> result = new ArrayList<MasterItem>();
@@ -53,22 +48,6 @@ private static final long serialVersionUID = 1L;
 	public void select(int index,boolean isSelect)
 	{
 		select.set(index, isSelect);
-	}
-	
-	public void onRemove()
-	{
-		boolean exit = false;
-		do{
-			exit = true;
-			for( int i =0; i< select.size(); i++){
-				if( true == select.get(i)){
-					objects.remove(i);
-					select.remove(i);
-					exit = false;
-					break;
-				}
-			}
-		}while(!exit);
 	}
 	
 	public void onEdit()
