@@ -1,24 +1,24 @@
-package ru.grizzly_jr.level_edit;
+package items_component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
 
-public class ItemListModel extends AbstractListModel
+public class ShapeListModel extends AbstractListModel
 {
 	private static final long serialVersionUID = 1L;
 	
-	private List<ModelItem> objects = new ArrayList<ModelItem>();
+	private List<Shape> objects = new ArrayList<Shape>();
 	private List<Boolean> select = new ArrayList<Boolean>();
 	
-	public void add(ModelItem obj)
+	public void add(Shape obj)
 	{
 		objects.add(obj);
 		select.add(false);
 	}
 	
-	public void remove(ModelItem obj)
+	public void remove(Shape obj)
 	{
 		for( int i = 0; i < objects.size(); i++){
 			if( obj == objects.get(i)){
@@ -29,9 +29,9 @@ public class ItemListModel extends AbstractListModel
 		}
 	}
 	
-	public List<ModelItem> getSelectItem()
+	public List<Shape> getSelectItem()
 	{
-		List<ModelItem> result = new ArrayList<ModelItem>();
+		List<Shape> result = new ArrayList<Shape>();
 		for( int i =0; i< select.size(); i++){
 			if( true == select.get(i)){
 				result.add(objects.get(i));
@@ -52,11 +52,6 @@ public class ItemListModel extends AbstractListModel
 		select.set(index, isSelect);
 	}
 	
-	public void onEdit()
-	{
-		
-	}
-	
 	public void onRemove()
 	{
 		boolean exit = false;
@@ -64,7 +59,7 @@ public class ItemListModel extends AbstractListModel
 			exit = true;
 			for( int i =0; i< select.size(); i++){
 				if( true == select.get(i)){
-					ModelItem.executeDelete( objects.get(i) );
+					remove(objects.get(i));
 					exit = false;
 					break;
 				}

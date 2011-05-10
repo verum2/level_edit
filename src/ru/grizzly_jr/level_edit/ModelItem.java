@@ -1,5 +1,7 @@
 package ru.grizzly_jr.level_edit;
 
+import items_component.MasterItem;
+
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,16 +30,26 @@ public class ModelItem {
 		this.y = y;
 	}
 	
-	public ModelItem(String name)
+	public ModelItem(String name,List<MasterItem> masters)
 	{
-		master = new MasterItem(name);
+		for( MasterItem master: masters){
+			if( name.equals(master.name)){
+				this.master = master;
+				return;
+			}
+		}
 	}
 	
-	public ModelItem(String name,double x,double y)
+	public ModelItem(String name,List<MasterItem> masters,double x,double y)
 	{
 		this.x = x;
 		this.y = y;
-		master = new MasterItem(name);
+		for( MasterItem master: masters){
+			if( name.equals(master.name)){
+				this.master = master;
+				return;
+			}
+		}
 	}
 
 	public Image getImage() {

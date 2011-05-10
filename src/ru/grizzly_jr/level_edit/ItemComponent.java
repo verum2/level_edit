@@ -1,5 +1,7 @@
 package ru.grizzly_jr.level_edit;
 
+import items_component.MasterItem;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -41,7 +43,7 @@ public class ItemComponent extends JPanel {
 			return;		
 	
 		if( isSelect){
-			g.setColor(new Color(100,100,255));
+			g.setColor(new Color(180,180,255));
 		}else{
 			g.setColor(new Color(255,255,255));
 		}

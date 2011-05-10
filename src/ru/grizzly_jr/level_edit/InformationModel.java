@@ -1,12 +1,15 @@
 package ru.grizzly_jr.level_edit;
 
+import items_component.MasterItem;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class InformationModel {
 	public static class Element
 	{
 		public String name;
-		public List<MasterItem> items;
+		public List<MasterItem> items = new ArrayList<MasterItem>();
 	};
 	
 	private List<Element> elements;

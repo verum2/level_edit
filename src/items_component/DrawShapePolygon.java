@@ -1,8 +1,11 @@
-package ru.grizzly_jr.level_edit;
+package items_component;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+
+import ru.grizzly_jr.level_edit.PointD;
+import ru.grizzly_jr.level_edit.Translate;
 
 /**
  * Класс хранит данные о рисующейся в данный момент полилинии и способен ее

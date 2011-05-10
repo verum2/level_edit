@@ -1,4 +1,4 @@
-package ru.grizzly_jr.level_edit;
+package items_component;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -6,15 +6,16 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShapePolygon {
+import ru.grizzly_jr.level_edit.PointD;
+import ru.grizzly_jr.level_edit.Translate;
+
+public class ShapePolygon implements Shape{
 	
-	private List<PointD> points = null;
+	private List<PointD> points = new ArrayList<PointD>();
 	private Color lineColor;
 	
 	public ShapePolygon(Color lineColor) {
-		super();
-		this.lineColor=lineColor;
-		points = new ArrayList<PointD>();
+		this.lineColor = lineColor;
 	}
 
 	
@@ -31,6 +32,22 @@ public class ShapePolygon {
 		return points.size();
 	}
 
+	@Override
+	public String toString()
+	{
+		String result = "";
+		for( PointD point: points){
+			result += "("+point.getX()+","+point.getY()+")";
+			result += "\n";
+		}
+		return result;
+	}
+	
+	@Override
+	public void draw(Graphics2D g){
+		draw(g,true);
+	}
+	
 	public void draw(Graphics2D g,boolean isFinished) {
 		/*
 		BasicStroke stroke = new BasicStroke((float) lineOptions.getThick(),
@@ -60,6 +77,12 @@ public class ShapePolygon {
 		g.drawLine(fp.x,fp.y,ep.x,ep.y);
 		}
 	}
+	
+	@Override
+	public void drawWithZoom(Graphics2D g,double zoom,Point move) {
+		drawWithZoom(g, true,zoom, move);
+	}
+	
 	public void drawWithZoom(Graphics2D g,boolean isFinished,double zoom,Point move) {
 		/*
 		BasicStroke stroke = new BasicStroke((float) lineOptions.getThick(),

@@ -1,9 +1,10 @@
-package ru.grizzly_jr.level_edit;
+package items_component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractListModel;
+
 
 public class ItemListMasterModel extends AbstractListModel {
 private static final long serialVersionUID = 1L;
@@ -28,6 +29,11 @@ private static final long serialVersionUID = 1L;
 		}
 	}
 	
+	public List<MasterItem> getItem()
+	{		
+		return objects;
+	}
+	
 	public List<MasterItem> getSelectItem()
 	{
 		List<MasterItem> result = new ArrayList<MasterItem>();
@@ -43,6 +49,7 @@ private static final long serialVersionUID = 1L;
 	public void clear()
 	{
 		objects.clear();
+		select.clear();
 	}
 	
 	public void select(int index,boolean isSelect)

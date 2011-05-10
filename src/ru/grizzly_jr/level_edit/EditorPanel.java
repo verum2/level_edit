@@ -31,6 +31,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	
 	private static final long serialVersionUID = 1L;
 	private BufferedImage image = null;
+	private String background_path;
 	private double widthImage;
 	private double heightImage;
 	private List<ModelItem> list = new ArrayList<ModelItem>();
@@ -39,10 +40,12 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	private int scrollY = 0;
 	private int scrollMouse = 0;
 	private boolean isShaped= false;
+	private InformationPanel info_panel = null;
 
-	public EditorPanel()
+	public EditorPanel(InformationPanel panel_info)
 	{
 		super(new BorderLayout());
+		info_panel = panel_info;
 		setMaximumSize(new Dimension(320,10000));
 		setMinimumSize(new Dimension(320,20));
 		setPreferredSize(new Dimension(320,480));
@@ -64,9 +67,29 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	    ModelItem.addListenerDelete(this);
 	}
 	
+	public void reverseShaped()
+	{
+		isShaped = !isShaped;
+	}
+	
 	public void setResolution(Resolution res)
 	{
 		this.resolution = res;
+		scrollMouse = 0;
+	}
+	
+	public InformationLevel getInformation()
+	{
+		InformationLevel info = new InformationLevel();
+		info.background = background_path;
+		info.models = list;
+		return info;
+	}
+	
+	public void setInformation(InformationLevel info)
+	{
+		load(info.background);
+		setItems(info.models);
 	}
 	
 	public boolean load(String path)
@@ -75,6 +98,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			image = ImageIO.read(new File(path));
 			widthImage = Translate.pixelToMetrs( image.getWidth());
 			heightImage = Translate.pixelToMetrs( image.getHeight());
+			background_path = path;
 			return true;
 		} catch (IOException e) {
 		}
@@ -84,18 +108,21 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	public void setItems(List<ModelItem> list)
 	{
 		this.list = list;
+		info_panel.setItems(list);
 		repaint();
 	}
 	
 	public void addItem(ModelItem item)
 	{
 		list.add(item);
+		info_panel.addItem(item);
 		repaint();
 	}
 	
 	public void addCenterItem(ModelItem item)
 	{
 		list.add(item);
+		info_panel.addItem(item);
 		Rectangle rec = getRec();
 		double w = Translate.pixelToMetrs(rec.width);
 		double h = Translate.pixelToMetrs(rec.height);
@@ -113,6 +140,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	public void removeItem(ModelItem item)
 	{
 		list.remove(item);
+		info_panel.removeItem(item);
 		repaint();
 	}
 	
@@ -126,10 +154,10 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			rec.y = 10;
 		}else{
 			switch( resolution){
-			case IPAD: rec.width = 1024; rec.height = 768; break;
+			case IPAD: rec.width = 320; rec.height = 427; break;
 			case IPOD: rec.width = 320; rec.height = 480; break;
 			case IPHONE1: rec.width = 320; rec.height = 480; break;
-			case IPHONE2: rec.width = 640; rec.height = 960; break;
+			case IPHONE2: rec.width = 320; rec.height = 480; break;
 			}
 			rec.x = (EditorPanel.this.getWidth() - rec.width)/2;
 			rec.y = (EditorPanel.this.getHeight() - rec.height)/2;
@@ -216,13 +244,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			int x = 0;
 			int y = 0;
 			
-			Rectangle rec = new Rectangle();
-			switch( resolution){
-			case IPAD: rec.width = 1024; rec.height = 768; break;
-			case IPOD: rec.width = 320; rec.height = 480; break;
-			case IPHONE1: rec.width = 320; rec.height = 480; break;
-			case IPHONE2: rec.width = 640; rec.height = 960; break;
-			}
+			Rectangle rec = getRec();
 			
 			int ww = Math.max(rec.width, EditorPanel.this.getWidth());
 			int hh = Math.max(rec.height, EditorPanel.this.getHeight());

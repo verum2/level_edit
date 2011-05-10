@@ -1,5 +1,8 @@
 package ru.grizzly_jr.level_edit;
 
+import items_component.ItemListMasterModel;
+import items_component.MasterItem;
+
 import java.awt.Component;
 
 import javax.swing.JList;

@@ -1,4 +1,5 @@
-package ru.grizzly_jr.level_edit;
+package items_component;
+
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -8,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+
+import ru.grizzly_jr.level_edit.Translate;
 
 public class MasterItem {
 	private static final String path = "data/";
@@ -47,13 +50,9 @@ public class MasterItem {
 		imageWithShapes=new BufferedImage(cm, raster,
 				isAlphaPremultiplied, null);
 		
-		for (ShapePolygon shapePolygon : physic.getPolygonList()) {
-			shapePolygon.draw(imageWithShapes.createGraphics(),true);
-		}
-		for (ShapeCircle shapeCircle : physic.getCircleList()) {
-			shapeCircle.draw(imageWithShapes.createGraphics());
-		}
-			
+		for (Shape shape : physic.getShapes()) {
+			shape.draw(imageWithShapes.createGraphics());
+		}			
 	}
 	
 	public BufferedImage getImage(boolean isShaped) {
