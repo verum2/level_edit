@@ -27,14 +27,12 @@ public class Translate {
 	
 	public static Point pointMetrsToPixelWithZoom(PointD m, double zoom)
 	{
-		Point result= new Point(metrsToPixelWithZoom(m.getX(), zoom), metrsToPixelWithZoom(m.getY(), zoom));
-		return result;
+		return new Point(metrsToPixelWithZoom(m.getX(), zoom), metrsToPixelWithZoom(m.getY(), zoom));
 	}
 	
 	public static PointD pointPixelToMetrsWithZoom(Point p, double zoom)
 	{
-		PointD result = new PointD(pixelToMetrsWithZoom((int)p.getX(), zoom), pixelToMetrsWithZoom((int)p.getY(), zoom));
-		return result;
+		return new PointD(pixelToMetrsWithZoom((int)p.getX(), zoom), pixelToMetrsWithZoom((int)p.getY(), zoom));
 	}
 	
 }

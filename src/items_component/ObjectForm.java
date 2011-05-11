@@ -1,5 +1,6 @@
 package items_component;
 
+import items_component.MasterItem.TypeItem;
 import items_component.PaintSheet.DrawShapeType;
 import items_component.ShapeComponent.RemoveListener;
 
@@ -38,12 +39,16 @@ public class ObjectForm extends JDialog {
 	private JTextField angular = null;
 	private JTextField isBullet = null;
 	
-	public ObjectForm(ComponentsPanel parent,String name)
+	public ObjectForm(ComponentsPanel parent,String name,String type)
 	{
 		super();
 		this.parent = parent;
-		
-		masterItem = new MasterItem(name);
+		if( type.equals("physic")){
+			masterItem = new MasterItem(name,TypeItem.PHYSIC);
+		}
+		if( type.equals("shelf")){
+			masterItem = new MasterItem(name,TypeItem.SHELF);
+		}
 		init();
 	}
 	
@@ -71,6 +76,7 @@ public class ObjectForm extends JDialog {
 		}
 		
 		sheet_panel = new PaintSheet(masterItem);
+		sheet_panel.setDrawShapeType(DrawShapeType.NONE);
 		
 		sheet_panel.addListener(new PaintSheet.ListenerActiveLine() {
 			
@@ -87,31 +93,34 @@ public class ObjectForm extends JDialog {
 		
 		this.add(sheet_panel,BorderLayout.CENTER);
 		
-		JScrollPane scrollpane = new JScrollPane(shapeInfo);
-		scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollpane.setPreferredSize(new Dimension(150,100));
+		if( TypeItem.PHYSIC == masterItem.getType() || TypeItem.SHELF == masterItem.getType()){
+			JScrollPane scrollpane = new JScrollPane(shapeInfo);
+			scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+			scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			scrollpane.setPreferredSize(new Dimension(150,100));
+			
+			this.add(scrollpane,BorderLayout.EAST);
 		
-		this.add(scrollpane,BorderLayout.EAST);
-		
-		JPanel south = new JPanel(new GridLayout(1,6));
-		linear = new JTextField( String.valueOf(masterItem.physic.linear_damping) );
-		angular = new JTextField( String.valueOf(masterItem.physic.angular_damping) );
-		isBullet = new JTextField( String.valueOf(masterItem.physic.isBullet) );
-		south.add(new JLabel("linear damping:"));
-		south.add(linear);
-		south.add(new JLabel("angular damping:"));
-		south.add(angular);
-		south.add(new JLabel("is bullet:"));
-		south.add(isBullet);
-		
-		this.add(south,BorderLayout.SOUTH);
-		
-		reSizeShapeInfo();
+			JPanel south = new JPanel(new GridLayout(1,6));
+			linear = new JTextField( String.valueOf(masterItem.physic.linear_damping) );
+			angular = new JTextField( String.valueOf(masterItem.physic.angular_damping) );
+			isBullet = new JTextField( String.valueOf(masterItem.physic.isBullet) );
+			south.add(new JLabel("linear damping:"));
+			south.add(linear);
+			south.add(new JLabel("angular damping:"));
+			south.add(angular);
+			south.add(new JLabel("is bullet:"));
+			south.add(isBullet);
+			this.add(south,BorderLayout.SOUTH);
+			reSizeShapeInfo();
+		}
 	}
 	
 	private void reSizeShapeInfo()
 	{
+		if( TypeItem.PHYSIC != masterItem.getType() && TypeItem.SHELF != masterItem.getType())
+			return;
+		
 		shapeInfo.removeAll();
 		
 		shapeInfo.setLayout(new GridBagLayout());
@@ -166,33 +175,54 @@ public class ObjectForm extends JDialog {
 		file.add(new JSeparator());
 		file.add(exitI);
 		
-		JMenuItem circleI = new JMenuItem("Circle");
-		JMenuItem polygonI = new JMenuItem("Polygon");
-		circleI.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sheet_panel.setDrawShapeType(DrawShapeType.Circle);
-			}});
-		polygonI.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				sheet_panel.setDrawShapeType(DrawShapeType.Polygon);
-			}});
-		
-		setting.add(circleI);
-		setting.add(polygonI);
+		if( TypeItem.PHYSIC == masterItem.getType() || TypeItem.SHELF == masterItem.getType())
+		{
+			JMenuItem circleI = new JMenuItem("Circle");
+			JMenuItem polygonI = new JMenuItem("Polygon");
+			circleI.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					sheet_panel.setDrawShapeType(DrawShapeType.PHYSIC_CIRCLE);
+				}});
+			polygonI.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					sheet_panel.setDrawShapeType(DrawShapeType.PHYSIC_POLYGON);
+				}});
+			
+			setting.add(circleI);
+			setting.add(polygonI);
+		}
+		if( TypeItem.SHELF == masterItem.getType())
+		{
+			JMenuItem point1_down = new JMenuItem("thread 1 point");
+			JMenuItem point2_down = new JMenuItem("thread 2 point");
+			point1_down.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					sheet_panel.setDrawShapeType(DrawShapeType.SHELF_THREAD_1_DOWN);
+				}});
+			point2_down.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent arg0) {
+					sheet_panel.setDrawShapeType(DrawShapeType.SHELF_THREAD_2_DOWN);
+				}});
+			setting.add(point1_down);
+			setting.add(point2_down);
+		}
 	}
 
 	private void onSave()
 	{
-		for(Component comp: shapeInfo.getComponents())
+		if( TypeItem.PHYSIC == masterItem.getType() || TypeItem.SHELF == masterItem.getType())
 		{
-			if( comp instanceof ShapeComponent)
+			for(Component comp: shapeInfo.getComponents())
 			{
-				((ShapeComponent)comp).recalculation();
+				if( comp instanceof ShapeComponent)
+				{
+					((ShapeComponent)comp).recalculation();
+				}
 			}
+			masterItem.physic.linear_damping = Double.valueOf(linear.getText());
+			masterItem.physic.angular_damping = Double.valueOf(angular.getText());
+			masterItem.physic.isBullet = Boolean.valueOf(isBullet.getText());
 		}
-		masterItem.physic.linear_damping = Double.valueOf(linear.getText());
-		masterItem.physic.angular_damping = Double.valueOf(angular.getText());
-		masterItem.physic.isBullet = Boolean.valueOf(isBullet.getText());
 		
 		parent.addMaster(this.masterItem);
 		setVisible(false);

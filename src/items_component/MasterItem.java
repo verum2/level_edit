@@ -1,6 +1,8 @@
 package items_component;
 
 
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -13,19 +15,33 @@ import javax.imageio.ImageIO;
 import ru.grizzly_jr.level_edit.Translate;
 
 public class MasterItem {
+	public enum TypeItem
+	{
+		PHYSIC,
+		SHELF
+	}
+	
 	private static final String path = "data/";
 	public String name;
 	
 	public PhysicItem physic = new PhysicItem();
+	public ShelfPhysicItem shelf = new ShelfPhysicItem();
 	
 	private BufferedImage image = null;
 	private BufferedImage imageWithShapes = null;
 	private double width = 0;
 	private double height = 0;
+	private TypeItem type;
 	
-	public MasterItem(String name)
+	public MasterItem(String name,TypeItem type)
 	{
+		this.type = type;
 		loadImage(name);
+	}
+	
+	public TypeItem getType()
+	{
+		return type;
 	}
 	
 	public void loadImage(String name)
@@ -34,6 +50,7 @@ public class MasterItem {
 			image = ImageIO.read(new File(path+name+".png"));
 			width = Translate.pixelToMetrs( image.getWidth());
 			height = Translate.pixelToMetrs( image.getHeight());
+			imageWithShapes = image;
 			this.name = name;
 			redrawImageWithShapes();
 		} catch (IOException e) {
@@ -43,16 +60,35 @@ public class MasterItem {
 
 	public void redrawImageWithShapes()
 	{
+		if( TypeItem.PHYSIC == type || TypeItem.SHELF == type){
+			ColorModel cm = image.getColorModel();
+			boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+			WritableRaster raster = image.copyData(null);
+			imageWithShapes = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+			
+			for (Shape shape : physic.getShapes()) {
+				shape.draw(imageWithShapes.createGraphics());
+			}
+			
+			if( TypeItem.SHELF == type){
+				drawShelf(imageWithShapes.createGraphics());
+				
+			}
+		}
+	}
+	
+	public void drawShelf(Graphics2D g)
+	{
+		g.setColor(Color.red);
 		
-		ColorModel cm = image.getColorModel();
-		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-		WritableRaster raster = image.copyData(null);
-		imageWithShapes=new BufferedImage(cm, raster,
-				isAlphaPremultiplied, null);
-		
-		for (Shape shape : physic.getShapes()) {
-			shape.draw(imageWithShapes.createGraphics());
-		}			
+		int radius = 3;
+		int p1_x = Translate.metrsToPixel(shelf.point1.getX());
+		int p1_y = Translate.metrsToPixel(shelf.point1.getY());
+		int p2_x = Translate.metrsToPixel(shelf.point2.getX());
+		int p2_y = Translate.metrsToPixel(shelf.point2.getY());
+			
+		g.fillOval(p1_x - radius, p1_y - radius, radius * 2,radius * 2);
+		g.fillOval(p2_x - radius, p2_y - radius, radius * 2,radius * 2);
 	}
 	
 	public BufferedImage getImage(boolean isShaped) {

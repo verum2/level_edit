@@ -58,6 +58,16 @@ public class ItemComponent extends JPanel {
 		
 		String name = master.name;
 		g.drawChars(name.toCharArray(), 0, name.length(), 0, height+12);
+		
+		switch( master.getType())
+		{
+		case PHYSIC:
+			g.drawChars("physic".toCharArray(), 0, 6, 100, height+12);
+			break;
+		case SHELF:
+			g.drawChars("shelf".toCharArray(), 0, 5, 100, height+12);
+			break;
+		}
 	}
 	
 	public void select(boolean isSelect)

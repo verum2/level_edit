@@ -2,6 +2,7 @@ package ru.grizzly_jr.level_edit;
 
 import items_component.ComponentsPanel;
 import items_component.MasterItem;
+import items_component.MasterItem.TypeItem;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -27,7 +28,13 @@ public class Form extends JFrame {
 	{
 		@Override
 		public void add(MasterItem master) {
-			ModelItem model = new ModelItem(master);
+			ModelItem model = null;
+			if( TypeItem.SHELF == master.getType()){
+				model = new ShelfItem(master);
+			}
+			if( TypeItem.PHYSIC == master.getType()){
+				model = new ModelItem(master);
+			}
 			editor_panel.addCenterItem(model);
 		}
 	}
@@ -39,10 +46,6 @@ public class Form extends JFrame {
 	private JMenuBar menubar = new JMenuBar();
 	private JTextField max_count_bullet = new JTextField("0");
 	private JTextField max_time = new JTextField("0.0");
-	private JTextField gun_x = new JTextField("0.0");
-	private JTextField gun_y = new JTextField("0.0");
-	private JTextField bag_x = new JTextField("0.0");
-	private JTextField bag_y = new JTextField("0.0");
 	
 	public Form()
 	{
@@ -58,22 +61,12 @@ public class Form extends JFrame {
 		initMenuBar();
 		this.setJMenuBar(menubar);
 		
-		JPanel south = new JPanel(new GridLayout(4, 3));
+		JPanel south = new JPanel(new GridLayout(2, 2));
 		south.add(new JLabel("max count bullet:"));
 		south.add(max_count_bullet);
-		south.add(new JLabel(""));
 		
 		south.add(new JLabel("max time:"));
 		south.add(max_time);
-		south.add(new JLabel(""));
-		
-		south.add(new JLabel("rabbit gun:"));
-		south.add(gun_x);
-		south.add(gun_y);
-		
-		south.add(new JLabel("rabbit bag:"));
-		south.add(bag_x);
-		south.add(bag_y);
 		
 		this.add(info_panel,BorderLayout.WEST);
 		this.add(editor_panel,BorderLayout.CENTER);

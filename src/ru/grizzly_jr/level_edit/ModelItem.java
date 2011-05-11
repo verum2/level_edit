@@ -2,6 +2,7 @@ package ru.grizzly_jr.level_edit;
 
 import items_component.MasterItem;
 
+import java.awt.Graphics;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ public class ModelItem {
 	public double x = 0;
 	public double y = 0;
 
-	private MasterItem master = null;
+	protected MasterItem master = null;
 	
 	public ModelItem clone()
 	{
@@ -51,6 +52,11 @@ public class ModelItem {
 			}
 		}
 	}
+	
+	public void update()
+	{
+		
+	}
 
 	public Image getImage() {
 		return master.getImage();
@@ -83,10 +89,19 @@ public class ModelItem {
 	{
 		double pxd = Translate.pixelToMetrs(px);
 		double pyd = Translate.pixelToMetrs(py);
-		if( x > pxd || pxd > x+master.getWidth() ||
-			y > pyd || pyd > y+master.getHeight())
+		if( x > pxd || pxd > x + master.getWidth() ||
+			y > pyd || pyd > y + master.getHeight())
 			return false;
 		return true;
+	}
+	
+	public void draw(Graphics g,int xS, int yS,boolean isShaped)
+	{
+		int w = Translate.metrsToPixel(getWidth());
+		int h = Translate.metrsToPixel(getHeight());
+		int x = Translate.metrsToPixel(this.x) + xS;
+		int y = Translate.metrsToPixel(this.y) + yS;
+		g.drawImage(getImage(isShaped),x,y,w,h,null);
 	}
 	
 	public static interface isDelete

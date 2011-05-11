@@ -1,10 +1,12 @@
 package ru.grizzly_jr.level_edit.LoadSave;
 
 import items_component.MasterItem;
+import items_component.MasterItem.TypeItem;
 import items_component.PhysicItem;
 import items_component.Shape;
 import items_component.ShapeCircle;
 import items_component.ShapePolygon;
+import items_component.ShelfPhysicItem;
 
 import java.awt.Color;
 import java.io.File;
@@ -18,6 +20,7 @@ import ru.grizzly_jr.level_edit.InformationModel;
 import ru.grizzly_jr.level_edit.InformationModel.Element;
 import ru.grizzly_jr.level_edit.ModelItem;
 import ru.grizzly_jr.level_edit.PointD;
+import ru.grizzly_jr.level_edit.ShelfItem;
 import xmlwise.Plist;
 import xmlwise.XmlParseException;
 
@@ -92,8 +95,15 @@ public class Load {
 		@SuppressWarnings("unchecked")
 		Map<String,Object> map = (Map<String,Object>)obj;
 		result.tabbed_name = (String)map.get("tabbed name");
-		result.item = new MasterItem((String)map.get("id"));
-		result.item.physic = loadPhysicItem(map.get("physic"));
+		String type = (String)map.get("type");
+		if( type.equals("physic")){
+			result.item = new MasterItem((String)map.get("id"),TypeItem.PHYSIC);
+			result.item.physic = loadPhysicItem(map);
+		}
+		if( type.equals("shelf")){
+			result.item = new MasterItem((String)map.get("id"),TypeItem.SHELF);
+			result.item.shelf = loadShelfItem(map);
+		}
 		
 		return result;
 	}
@@ -113,6 +123,19 @@ public class Load {
 			shapes.add(loadShape(iter));
 		}
 		item.setShapes(shapes);
+		return item;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static ShelfPhysicItem loadShelfItem(Object obj)
+	{
+		Map<String,Object> map = (Map<String,Object>)obj;
+		ShelfPhysicItem item = new ShelfPhysicItem();
+		item.point1 = loadPointD( map.get("thread 1"));
+		item.point2 = loadPointD( map.get("thread 2"));
+		item.strength1 = (Double)map.get("strength thread 1");
+		item.strength2 = (Double)map.get("strength thread 2");
+		
 		return item;
 	}
 	
@@ -178,6 +201,24 @@ public class Load {
 		PointD pos = loadPointD(map.get("position"));
 		String id = (String)map.get("id");
 		
-		return new ModelItem(id,models,pos.getX(),pos.getY());
+		MasterItem master = findMaster(id);
+		if(TypeItem.SHELF == master.getType())
+		{
+			ShelfItem result = new ShelfItem(master,pos.getX(),pos.getY());
+			result.point1 = loadPointD(map.get("thread 1"));
+			result.point2 = loadPointD(map.get("thread 2"));
+			return result;
+		}
+		return new ModelItem(master,pos.getX(),pos.getY());
+	}
+	
+	private static MasterItem findMaster(String name)
+	{
+		for( MasterItem master: models){
+			if( name.equals(master.name)){
+				return master;
+			}
+		}
+		return null;
 	}
 }

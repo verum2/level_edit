@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
@@ -31,6 +32,11 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	
 	private static final long serialVersionUID = 1L;
 	private BufferedImage image = null;
+	private BufferedImage gun_image = null;
+	private BufferedImage bag_image = null;
+	private Point gun_p = new Point(0,0);
+	private Point bag_p = new Point(0,0);
+	
 	private String background_path;
 	private double widthImage;
 	private double heightImage;
@@ -45,6 +51,12 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	public EditorPanel(InformationPanel panel_info)
 	{
 		super(new BorderLayout());
+		try {
+			gun_image = ImageIO.read(new File("data/rabbitgun.png"));
+			bag_image = ImageIO.read(new File("data/rabbitbag.png"));
+		} catch (IOException e1) {
+		}
+		
 		info_panel = panel_info;
 		setMaximumSize(new Dimension(320,10000));
 		setMinimumSize(new Dimension(320,20));
@@ -67,6 +79,22 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	    ModelItem.addListenerDelete(this);
 	}
 	
+	public void setPosition(PointD gun, PointD bag)
+	{
+		gun_p = new Point(Translate.metrsToPixel(gun.x),Translate.metrsToPixel(gun.y));
+		bag_p = new Point(Translate.metrsToPixel(bag.x),Translate.metrsToPixel(bag.y));
+	}
+	
+	public PointD getPositionGun()
+	{
+		return new PointD(Translate.pixelToMetrs(gun_p.x),Translate.pixelToMetrs(gun_p.y));
+	}
+	
+	public PointD getPositionBag()
+	{
+		return new PointD(Translate.pixelToMetrs(bag_p.x),Translate.pixelToMetrs(bag_p.y));
+	}
+	
 	public void reverseShaped()
 	{
 		isShaped = !isShaped;
@@ -83,6 +111,8 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 		InformationLevel info = new InformationLevel();
 		info.background = background_path;
 		info.models = list;
+		info.rabbit_gun = getPositionGun();
+		info.rabbit_bag = getPositionBag();
 		return info;
 	}
 	
@@ -92,6 +122,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			return;
 		load(info.background);
 		setItems(info.models);
+		setPosition(info.rabbit_gun, info.rabbit_bag);
 	}
 	
 	public boolean load(String path)
@@ -135,6 +166,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 		
 		item.x = x + Math.min(w,w2)/2.0;
 		item.y = y + Math.min(h,h2)/2.0;
+		item.update();
 		
 		repaint();
 	}
@@ -172,10 +204,14 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 		private int lastY = 0;
 		private int lastX = 0;
 		private ModelItem item = null;
+		private boolean is_gun = false;
+		private boolean is_bag = false;
 
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			item = null;
+			is_gun = false;
+			is_bag = false;
 		}
 		
 		@Override
@@ -185,11 +221,27 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			
 			Rectangle rec = getRec();
 			
+			item = null;
 			for( ModelItem it: list){
-				if( it.collisionPoint(lastX-rec.x, lastY-rec.y+scrollMouse)){
+				if( it.collisionPoint(lastX-rec.x, lastY-rec.y+scrollMouse-10)){
 					item = it;
 				}
 			}
+			if( null == item){
+				int x = lastX-rec.x;
+				int y = lastY-rec.y+scrollMouse-10;
+				if( gun_p.x < x && x < gun_p.x+ gun_image.getWidth() &&
+					gun_p.y < y && y < gun_p.y+ gun_image.getHeight()){
+					is_gun = true;
+					return;
+				}
+				if( bag_p.x < x && x < bag_p.x+ bag_image.getWidth() &&
+					bag_p.y < y && y < bag_p.y+ bag_image.getHeight()){
+					is_bag = true;
+					return;
+				}
+			}
+			
 		}
 
 		@Override
@@ -207,8 +259,18 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			if( null != item){
 				item.move(x-lastX,y-lastY);
 			}
+			if( is_gun)
+			{
+				gun_p.x += x-lastX;
+				gun_p.y += y-lastY;
+			}
+			if( is_bag)
+			{
+				bag_p.x += x-lastX;
+				bag_p.y += y-lastY;
+			}			
 			
-			if( resolution != Resolution.FULL && null == item)
+			if( resolution != Resolution.FULL && null == item && !is_gun && !is_bag)
 			{				
 				scrollMouse += lastY - y;
 				if( scrollMouse < 0)
@@ -283,6 +345,8 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			}
 			
 			g.drawImage(image,x,y,w,h,null);
+			g.drawImage(bag_image,x+bag_p.x,y+bag_p.y,null);
+			g.drawImage(gun_image,x+gun_p.x,y+gun_p.y,null);
 			
 			for( ModelItem iter: list){
 				paintItem(iter,g,x,y);
@@ -293,12 +357,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 		{
 			if( null == item.getImage(isShaped))
 				return;
-			
-			int w = Translate.metrsToPixel(item.getWidth());
-			int h = Translate.metrsToPixel(item.getHeight());
-			int x = Translate.metrsToPixel(item.x) + xS;
-			int y = Translate.metrsToPixel(item.y) + yS;
-			g.drawImage(item.getImage(isShaped),x,y,w,h,null);
+			item.draw(g, xS, yS, isShaped);
 		}
 	}
 

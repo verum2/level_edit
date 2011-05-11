@@ -1,11 +1,8 @@
 package ru.grizzly_jr.level_edit;
 
 public class PointD {
-private double x;
-private double y;
-
-
-
+public double x;
+public double y;
 
 public PointD(double x, double y) {
 	super();

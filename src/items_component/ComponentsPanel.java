@@ -131,6 +131,7 @@ public class ComponentsPanel extends JPanel {
 			elements.add(element);
 			for( MasterItem item: iter.items){
 				element.list_model.add(item);
+				item.redrawImageWithShapes();
 			}
 			
 		}while(info.next());
@@ -201,7 +202,18 @@ public class ComponentsPanel extends JPanel {
 		if( null == name)
 			return;
 		
-		ObjectForm form = new ObjectForm(this,name);
+		Object[] possibilities = {"physic", "shelf"};
+		String type = (String)JOptionPane.showInputDialog(
+                this,
+                "Write type:\n",
+                "Create item",
+                JOptionPane.PLAIN_MESSAGE,
+                null,possibilities,"physic");
+
+		if( null == type)
+			return;
+		
+		ObjectForm form = new ObjectForm(this,name,type);
 		form.setVisible(true);
 	}
 	

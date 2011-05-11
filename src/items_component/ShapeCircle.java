@@ -19,7 +19,7 @@ public class ShapeCircle implements Shape {
 	
 	public ShapeCircle(PointD center, double radius,Color lineColor) {
 		super();
-		this.lineColor=lineColor;
+		this.lineColor = lineColor;
 		this.center = center;
 		this.radius = radius;
 	}
