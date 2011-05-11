@@ -1,22 +1,27 @@
 package items_component;
 
 import items_component.PaintSheet.DrawShapeType;
+import items_component.ShapeComponent.RemoveListener;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JList;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
-
+import javax.swing.JTextField;
 
 public class ObjectForm extends JDialog {
 
@@ -24,11 +29,14 @@ public class ObjectForm extends JDialog {
 	private PaintSheet sheet_panel;
 	private JMenuBar menubar = new JMenuBar();
 	
-	private ShapeListModel list_model = new ShapeListModel();
-	private JList shapeInfo = new JList(list_model);
+	private JPanel shapeInfo = new JPanel(new GridBagLayout());
 	private MasterItem masterItem;
 	
 	private ComponentsPanel parent;
+	
+	private JTextField linear = null;
+	private JTextField angular = null;
+	private JTextField isBullet = null;
 	
 	public ObjectForm(ComponentsPanel parent,String name)
 	{
@@ -56,10 +64,7 @@ public class ObjectForm extends JDialog {
 		initMenuBar();
 		this.setJMenuBar(menubar);
 		
-		JPanel east = new JPanel(new BorderLayout());
-		
 		shapeInfo.setBorder(BorderFactory.createTitledBorder("Options"));
-		shapeInfo.setCellRenderer(new ShapeCellRender());
 		
 		if( null != sheet_panel){
 			this.remove(sheet_panel);
@@ -71,15 +76,7 @@ public class ObjectForm extends JDialog {
 			
 			@Override
 			public void NotActive() {
-				shapeInfo.removeAll();
-				list_model.clear();
-				
-				for(Shape shape: masterItem.physic.getShapes())
-				{
-					list_model.add(shape);
-				}
-				
-				shapeInfo.updateUI();
+				reSizeShapeInfo();
 			}
 			
 			@Override
@@ -93,21 +90,57 @@ public class ObjectForm extends JDialog {
 		JScrollPane scrollpane = new JScrollPane(shapeInfo);
 		scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollpane.setPreferredSize(new Dimension(150,100));
 		
+		this.add(scrollpane,BorderLayout.EAST);
 		
-		JButton delete = new JButton("remove");
-		delete.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				list_model.onRemove();
-				shapeInfo.setCellRenderer(new ShapeCellRender());
-			}
-		});
+		JPanel south = new JPanel(new GridLayout(1,6));
+		linear = new JTextField( String.valueOf(masterItem.physic.linear_damping) );
+		angular = new JTextField( String.valueOf(masterItem.physic.angular_damping) );
+		isBullet = new JTextField( String.valueOf(masterItem.physic.isBullet) );
+		south.add(new JLabel("linear damping:"));
+		south.add(linear);
+		south.add(new JLabel("angular damping:"));
+		south.add(angular);
+		south.add(new JLabel("is bullet:"));
+		south.add(isBullet);
 		
-		east.add(scrollpane,  BorderLayout.CENTER);
-		east.add(delete,  BorderLayout.PAGE_END);
+		this.add(south,BorderLayout.SOUTH);
 		
-		this.add(east,BorderLayout.EAST);
+		reSizeShapeInfo();
+	}
+	
+	private void reSizeShapeInfo()
+	{
+		shapeInfo.removeAll();
+		
+		shapeInfo.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		
+		int i =0;
+		for(Shape shape: masterItem.physic.getShapes())
+		{
+			c.gridy = i+1;
+			final ShapeComponent comp = new ShapeComponent(shape);
+			comp.addListener(new RemoveListener() {
+				@Override
+				public void remove() {
+					for(Shape iter: masterItem.physic.getShapes()){
+						if( comp.getShape() == iter){
+							masterItem.physic.getShapes().remove(iter);
+							break;
+						}
+					}
+					sheet_panel.repaintImage();
+					reSizeShapeInfo();
+					ObjectForm.this.repaint();
+				}
+			});
+			
+			shapeInfo.add(comp,c);
+			i++;
+		}
+		ObjectForm.this.validate();
 	}
 	
 	private void initMenuBar()
@@ -150,6 +183,17 @@ public class ObjectForm extends JDialog {
 
 	private void onSave()
 	{
+		for(Component comp: shapeInfo.getComponents())
+		{
+			if( comp instanceof ShapeComponent)
+			{
+				((ShapeComponent)comp).recalculation();
+			}
+		}
+		masterItem.physic.linear_damping = Double.valueOf(linear.getText());
+		masterItem.physic.angular_damping = Double.valueOf(angular.getText());
+		masterItem.physic.isBullet = Boolean.valueOf(isBullet.getText());
+		
 		parent.addMaster(this.masterItem);
 		setVisible(false);
 	}

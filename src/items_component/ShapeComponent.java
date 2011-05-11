@@ -1,74 +1,117 @@
 package items_component;
 
-import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import ru.grizzly_jr.level_edit.PointD;
+import javax.swing.JTextField;
 
 public class ShapeComponent extends JPanel {
-
+	public interface RemoveListener
+	{
+		public void remove();
+	};	
+	
 	private static final long serialVersionUID = 1L;
 	private Shape shape;
-	private boolean isSelect = false;
-	private int height = 0;
+	private JTextField friction = null;
+	private JTextField spring = null;
+	private JTextField dencity = null;
+	private List<RemoveListener> listeners = new ArrayList<RemoveListener>();
 	
 	public ShapeComponent(Shape shape)
 	{
+		super(new GridBagLayout());
 		this.shape = shape;
+		
+		GridBagConstraints c = new GridBagConstraints();
+		c.gridwidth = 2;
+		
+		int yS = 1;
 		if( shape instanceof ShapeCircle){
-			height = 18;
-		}
-		if( shape instanceof ShapePolygon){
-			int count = ((ShapePolygon)shape).getPointCount();
-			height = count*15;
-		}
-		
-		this.setPreferredSize(new Dimension(200,height));
-		this.setSize(200,height);
-	}
-	
-	@Override
-	public void paint(Graphics g) {
-		super.paint(g);
-		
-		if( null == shape)
-			return;		
-	
-		if( isSelect){
-			g.setColor(new Color(180,180,255));
-		}else{
-			g.setColor(new Color(255,255,255));
-		}
-		
-		g.fillRect(0, 0, getWidth(), getHeight());
-		
-		g.setColor(new Color(0,0,0));
-		
-		if( shape instanceof ShapeCircle){
-			String text = "Circle: "+shape.toString();
-			g.drawChars(text.toCharArray(), 0, text.length(), 0, 10);
-		}
-		if( shape instanceof ShapePolygon){
-			ShapePolygon poly = ((ShapePolygon)shape);
-			int count = poly.getPointCount();
+			JLabel label = new JLabel("Circle:",JLabel.LEFT);
+			label.setForeground(((ShapeCircle)shape).getLineColor());
 			
-			String text = "Polygon: ";
-			g.drawChars(text.toCharArray(), 0, text.length(), 0, 10);
+			c.gridy = 0;
+			add(label,c);
+			/*c.gridy = 1;
+			add(new JLabel("   "+shape.toString(),JLabel.RIGHT),c);
+			yS = 2;*/
+		}
+		if( shape instanceof ShapePolygon){			
+			ShapePolygon poly = ((ShapePolygon)shape);
+			
+			JLabel label = new JLabel("Polygon:",JLabel.LEFT);
+			label.setForeground(poly.getLineColor());
+			c.gridy = 0;
+			add(label,c);
+			
+			/*int count = poly.getPointCount();
 			for( int i = 0; i < count; i++)
 			{
+				c.gridy = i+1;
 				PointD p = poly.getPoint(i);
-				text = "("+p.getX()+" , "+p.getY() +")";
-				g.drawChars(text.toCharArray(), 0, text.length(), 20, 15*(i+1)+10);
+				add(new JLabel("   ("+p.getX()+" , "+p.getY() +")",JLabel.RIGHT),c);
 			}
+			yS = count+1;*/
 		}
 		
+		c.gridwidth = 1;
+		
+		c.gridy = yS;
+		add(new JLabel("Friction:"),c);
+		friction = new JTextField(Double.toString(shape.getFriction()));
+		
+		friction.setPreferredSize(new Dimension(50,20));
+		add(friction,c);
+		
+		c.gridy = yS+1;
+		add(new JLabel("Spring:"),c);
+		spring = new JTextField(Double.toString(shape.getSpring()));
+		spring.setPreferredSize(new Dimension(50,20));
+		add(spring,c);
+		
+		c.gridy = yS+2;
+		add(new JLabel("Dencity:"),c);
+		dencity = new JTextField(Double.toString(shape.getDencity()));
+		dencity.setPreferredSize(new Dimension(50,20));
+		add(dencity,c);
+		
+		JButton delete = new JButton("delete");
+		delete.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				for( RemoveListener listener: listeners){
+					listener.remove();
+				}
+			}
+		});
+		
+		c.gridy = yS+3;
+		add(delete,c);
 	}
 	
-	public void select(boolean isSelect)
+	public void addListener(RemoveListener listener)
 	{
-		this.isSelect = isSelect;
+		listeners.add(listener);
+	}
+	
+	public void recalculation()
+	{
+		shape.setFriction(Double.valueOf(friction.getText()));
+		shape.setDencity(Double.valueOf(dencity.getText()));
+		shape.setSpring(Double.valueOf(spring.getText()));
+	}
+	
+	public Shape getShape()
+	{
+		return shape;
 	}
 }

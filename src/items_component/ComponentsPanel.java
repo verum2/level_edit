@@ -17,6 +17,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import ru.grizzly_jr.level_edit.InformationModel;
 import ru.grizzly_jr.level_edit.ItemCellRender;
+import ru.grizzly_jr.level_edit.LoadSave.Load;
 
 public class ComponentsPanel extends JPanel {
 	public interface ListenerAdd
@@ -117,6 +118,8 @@ public class ComponentsPanel extends JPanel {
 	
 	public void setInformation(InformationModel info)
 	{
+		if( null == info)
+			return;
 		info.update();
 		if( null == info.getElement())
 			return;
@@ -133,6 +136,7 @@ public class ComponentsPanel extends JPanel {
 		}while(info.next());
 		
 		setViewComponent();
+		Load.models = getMasterItems();
 	}
 	
 	public InformationModel getInformation()
@@ -143,6 +147,7 @@ public class ComponentsPanel extends JPanel {
 			InformationModel.Element element = new InformationModel.Element();
 			element.name = iter.name;
 			element.items = iter.list_model.getItem();
+			list.add(element);
 		}
 		
 		return new InformationModel(list);

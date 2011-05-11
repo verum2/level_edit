@@ -13,11 +13,20 @@ public class ShapeCircle implements Shape {
 	private double radius;
 	private Color lineColor;
 	
+	private double friction = 0.1;
+	private double spring = 0.1;
+	private double dencity = 1.1;
+	
 	public ShapeCircle(PointD center, double radius,Color lineColor) {
 		super();
 		this.lineColor=lineColor;
 		this.center = center;
 		this.radius = radius;
+	}
+	
+	public Color getLineColor()
+	{
+		return lineColor;
 	}
 	
 	public PointD getCenter() {
@@ -69,5 +78,29 @@ public class ShapeCircle implements Shape {
 					ccentr.y - Translate.metrsToPixelWithZoom(radius,zoom)+move.y,
 				    Translate.metrsToPixelWithZoom( radius * 2, zoom),
 				    Translate.metrsToPixelWithZoom( radius * 2, zoom));
-	}	
+	}
+	
+	public double getFriction() {
+		return friction;
+	}
+
+	public void setFriction(double friction) {
+		this.friction = friction;
+	}
+
+	public double getSpring() {
+		return spring;
+	}
+
+	public void setSpring(double spring) {
+		this.spring = spring;
+	}
+
+	public double getDencity() {
+		return dencity;
+	}
+
+	public void setDencity(double dencity) {
+		this.dencity = dencity;
+	}
 }

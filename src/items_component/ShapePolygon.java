@@ -14,10 +14,18 @@ public class ShapePolygon implements Shape{
 	private List<PointD> points = new ArrayList<PointD>();
 	private Color lineColor;
 	
+	private double friction = 0.2;
+	private double spring = 0.05;
+	private double dencity = 2.0;
+	
 	public ShapePolygon(Color lineColor) {
 		this.lineColor = lineColor;
 	}
 
+	public Color getLineColor()
+	{
+		return lineColor;
+	}
 	
 	public void addPoint(PointD point) {
 		points.add(point);
@@ -59,7 +67,7 @@ public class ShapePolygon implements Shape{
 		Point PreviousPoint = null;
 		for (PointD pd : points) {
 			Point p = Translate.pointMetrsToPixelWithZoom(pd, 1);
-			int radius=5;
+			int radius = 1;
 			g.fillOval(p.x - (int) radius, p.y
 					- (int) radius,
 					(int) radius * 2,
@@ -94,7 +102,7 @@ public class ShapePolygon implements Shape{
 		Point PreviousPoint = null;
 		for (PointD pd : points) {
 			Point p = Translate.pointMetrsToPixelWithZoom(pd, zoom);
-			int radius=5;
+			int radius = 1;
 			g.fillOval(p.x - (int) radius + move.x, p.y
 					- (int) radius + move.y,
 					(int) radius * 2,
@@ -112,7 +120,33 @@ public class ShapePolygon implements Shape{
 		g.drawLine(fp.x + move.x,fp.y + move.y,ep.x + move.x,ep.y + move.y);
 		}
 	}
-	
-	
+
+	public double getFriction() {
+		return friction;
+	}
+
+	public void setFriction(double friction) {
+		this.friction = friction;
+	}
+
+
+	public double getSpring() {
+		return spring;
+	}
+
+
+	public void setSpring(double spring) {
+		this.spring = spring;
+	}
+
+
+	public double getDencity() {
+		return dencity;
+	}
+
+
+	public void setDencity(double dencity) {
+		this.dencity = dencity;
+	}
 	
 }

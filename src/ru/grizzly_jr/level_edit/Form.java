@@ -4,19 +4,23 @@ import items_component.ComponentsPanel;
 import items_component.MasterItem;
 
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 
 import ru.grizzly_jr.level_edit.EditorPanel.Resolution;
+import ru.grizzly_jr.level_edit.LoadSave.Load;
+import ru.grizzly_jr.level_edit.LoadSave.Save;
 
 public class Form extends JFrame {
 	private class ListenerAddOnEdit implements ComponentsPanel.ListenerAdd
@@ -33,6 +37,12 @@ public class Form extends JFrame {
 	private EditorPanel editor_panel = new EditorPanel(info_panel);
 	private ComponentsPanel components_panel = new ComponentsPanel();
 	private JMenuBar menubar = new JMenuBar();
+	private JTextField max_count_bullet = new JTextField("0");
+	private JTextField max_time = new JTextField("0.0");
+	private JTextField gun_x = new JTextField("0.0");
+	private JTextField gun_y = new JTextField("0.0");
+	private JTextField bag_x = new JTextField("0.0");
+	private JTextField bag_y = new JTextField("0.0");
 	
 	public Form()
 	{
@@ -43,15 +53,32 @@ public class Form extends JFrame {
 
 		components_panel.addListener(new ListenerAddOnEdit());
 		
-		
 		onLoadModel();		
 		
 		initMenuBar();
 		this.setJMenuBar(menubar);
 		
+		JPanel south = new JPanel(new GridLayout(4, 3));
+		south.add(new JLabel("max count bullet:"));
+		south.add(max_count_bullet);
+		south.add(new JLabel(""));
+		
+		south.add(new JLabel("max time:"));
+		south.add(max_time);
+		south.add(new JLabel(""));
+		
+		south.add(new JLabel("rabbit gun:"));
+		south.add(gun_x);
+		south.add(gun_y);
+		
+		south.add(new JLabel("rabbit bag:"));
+		south.add(bag_x);
+		south.add(bag_y);
+		
 		this.add(info_panel,BorderLayout.WEST);
 		this.add(editor_panel,BorderLayout.CENTER);
 		this.add(components_panel,BorderLayout.EAST);
+		this.add(south,BorderLayout.SOUTH);
 	}
 	
 	private void initMenuBar()
@@ -129,7 +156,7 @@ public class Form extends JFrame {
 	{		
 		String name = (String)JOptionPane.showInputDialog(
                 this,
-                "Write name background(id):\n",
+                "Write name background:\n",
                 "Create level",
                 JOptionPane.PLAIN_MESSAGE,
                 null,null,null);
@@ -146,30 +173,52 @@ public class Form extends JFrame {
 	
 	private void onSaveLevel()
 	{
+		String name = (String)JOptionPane.showInputDialog(
+                this,
+                "Write name level:\n",
+                "save level",
+                JOptionPane.PLAIN_MESSAGE,
+                null,null,null);
+
+		if( null == name)
+			return;
+		
+		Save.save(name, editor_panel.getInformation());
 	}
 	
 	private void onSaveModel()
 	{
+		Save.save("items", components_panel.getInformation());
 	}
 	
 	private void onLoadLevel()
 	{
-		InformationLevel info_level = new InformationLevel();
+		String name = (String)JOptionPane.showInputDialog(
+                this,
+                "Write name level:\n",
+                "load level",
+                JOptionPane.PLAIN_MESSAGE,
+                null,null,null);
+
+		if( null == name)
+			return;
+		
+		/*InformationLevel info_level = new InformationLevel();
 		info_level.background = "data/back.png";
 		
 		List<MasterItem> ms = components_panel.getMasterItems();
 		info_level.models.add(new ModelItem("apple",ms,0.5,3.0));
 		info_level.models.add(new ModelItem("can",ms,0,0));
 		info_level.models.add(new ModelItem("can",ms,0.1,2.3));
-		info_level.models.add(new ModelItem("apple",ms,1.5,5.0));
+		info_level.models.add(new ModelItem("apple",ms,1.5,5.0));*/
 		
-		editor_panel.setInformation(info_level);
+		editor_panel.setInformation(Load.loadLevel(name));
 		repaint();
 	}
 	
 	private void onLoadModel()
 	{
-		List<InformationModel.Element> list = new ArrayList<InformationModel.Element>();
+		/*List<InformationModel.Element> list = new ArrayList<InformationModel.Element>();
 		InformationModel.Element element1 = new InformationModel.Element();
 		InformationModel.Element element2 = new InformationModel.Element();
 		element1.name = "fruit";
@@ -179,7 +228,8 @@ public class Form extends JFrame {
 		list.add(element1);
 		list.add(element2);
 		
-		components_panel.setInformation(new InformationModel(list));
+		components_panel.setInformation(new InformationModel(list));*/
+		components_panel.setInformation(Load.loadModel("items"));
 	}
 	
 	private void onExit()

@@ -88,6 +88,8 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	
 	public void setInformation(InformationLevel info)
 	{
+		if( null == info)
+			return;
 		load(info.background);
 		setItems(info.models);
 	}

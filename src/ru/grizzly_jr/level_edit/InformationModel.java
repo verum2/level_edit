@@ -26,6 +26,8 @@ public class InformationModel {
 	
 	public Element getElement()
 	{
+		if( elements.size() < 1)
+			return null;
 		return elements.get(index);
 	}
 	

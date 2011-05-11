@@ -52,10 +52,7 @@ public class PaintSheet extends JPanel {
 		Polygon
 	};
 	
-	
 	Color ShapeColor[]={new Color(255,0,0),new Color(0,255,0),new Color(0,0,255),new Color(255,255,0),new Color(255,0,255)};
-	
-	
 	
 	private List<ListenerActiveLine> listeners = new ArrayList<ListenerActiveLine>();
 	private static final long serialVersionUID = 1L;
