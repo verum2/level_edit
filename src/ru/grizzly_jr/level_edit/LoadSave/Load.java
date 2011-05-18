@@ -32,7 +32,7 @@ public class Load {
 		try {
 			InformationLevel result = new InformationLevel();
 			
-			Map<String, Object> map = Plist.load(new File("data/"+name+".level"));
+			Map<String, Object> map = Plist.load(new File("data/"+name+".plist"));
 			result.rabbit_gun = loadPointD(map.get("rabbit gun"));
 			result.rabbit_bag = loadPointD(map.get("rabbit bag"));
 			result.max_count_bullet = (Integer)map.get("max count bullet");
@@ -57,11 +57,12 @@ public class Load {
 	{
 		try {
 			List<Element> elements = new ArrayList<Element>();
-			Map<String, Object> map = Plist.load(new File("data/"+name+".items"));
+			Map<String, Object> map = Plist.load(new File("data/"+name+".plist"));
 			
 			@SuppressWarnings("unchecked")
-			List<Object> items = (List<Object>)map.get("items");
-			for( Object obj: items)
+			Map<String,Object> items = (Map<String,Object>)map.get("items");
+			
+			for( Object obj: items.values())
 			{
 				LoadElement element = loadElement(obj);
 				boolean test = true;
@@ -102,6 +103,7 @@ public class Load {
 		}
 		if( type.equals("shelf")){
 			result.item = new MasterItem((String)map.get("id"),TypeItem.SHELF);
+			result.item.physic = loadPhysicItem(map);
 			result.item.shelf = loadShelfItem(map);
 		}
 		
@@ -177,7 +179,7 @@ public class Load {
 		Map<String, Object> map = (Map<String, Object>)obj;
 	
 		double x = (Double)map.get("x");
-		double y = (Double)map.get("y");
+		double y = -(Double)map.get("y");
 		return new PointD(x, y);
 	}
 	

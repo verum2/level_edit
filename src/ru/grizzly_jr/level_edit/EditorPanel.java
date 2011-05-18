@@ -37,7 +37,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	private Point gun_p = new Point(0,0);
 	private Point bag_p = new Point(0,0);
 	
-	private String background_path;
+	private String background;
 	private double widthImage;
 	private double heightImage;
 	private List<ModelItem> list = new ArrayList<ModelItem>();
@@ -81,18 +81,24 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	
 	public void setPosition(PointD gun, PointD bag)
 	{
-		gun_p = new Point(Translate.metrsToPixel(gun.x),Translate.metrsToPixel(gun.y));
-		bag_p = new Point(Translate.metrsToPixel(bag.x),Translate.metrsToPixel(bag.y));
+		double w_gun = Translate.pixelToMetrs(gun_image.getWidth());
+		double h_gun = Translate.pixelToMetrs(gun_image.getHeight());
+		
+		double w_bag = Translate.pixelToMetrs(bag_image.getWidth());
+		double h_bag = Translate.pixelToMetrs(bag_image.getHeight());
+		
+		gun_p = Translate.getPoint(gun.x, gun.y, w_gun, h_gun);
+		bag_p = Translate.getPoint(gun.x, gun.y, w_bag, h_bag);
 	}
 	
 	public PointD getPositionGun()
 	{
-		return new PointD(Translate.pixelToMetrs(gun_p.x),Translate.pixelToMetrs(gun_p.y));
+		return Translate.getPointD(gun_p.x,	gun_p.y,gun_image.getWidth(), gun_image.getHeight());
 	}
 	
 	public PointD getPositionBag()
 	{
-		return new PointD(Translate.pixelToMetrs(bag_p.x),Translate.pixelToMetrs(bag_p.y));
+		return Translate.getPointD(bag_p.x,	bag_p.y,bag_image.getWidth(), bag_image.getHeight());
 	}
 	
 	public void reverseShaped()
@@ -109,7 +115,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 	public InformationLevel getInformation()
 	{
 		InformationLevel info = new InformationLevel();
-		info.background = background_path;
+		info.background = background;
 		info.models = list;
 		info.rabbit_gun = getPositionGun();
 		info.rabbit_bag = getPositionBag();
@@ -125,13 +131,15 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 		setPosition(info.rabbit_gun, info.rabbit_bag);
 	}
 	
-	public boolean load(String path)
+	public boolean load(String name)
 	{
 		try {
-			image = ImageIO.read(new File(path));
+			image = ImageIO.read(new File("data/"+name+".png"));
 			widthImage = Translate.pixelToMetrs( image.getWidth());
 			heightImage = Translate.pixelToMetrs( image.getHeight());
-			background_path = path;
+			Translate.width = image.getWidth();
+			Translate.height = image.getHeight();
+			background = name;
 			return true;
 		} catch (IOException e) {
 		}
@@ -157,15 +165,16 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 		list.add(item);
 		info_panel.addItem(item);
 		Rectangle rec = getRec();
-		double w = Translate.pixelToMetrs(rec.width);
-		double h = Translate.pixelToMetrs(rec.height);
-		double w2 = Translate.pixelToMetrs(this.getWidth());
-		double h2 = Translate.pixelToMetrs(this.getHeight());
-		double x = Translate.pixelToMetrs(scrollX);
-		double y = Translate.pixelToMetrs(scrollY+scrollMouse);
+		int w = (rec.width);
+		int h = (rec.height);
+		int w2 = (this.getWidth());
+		int h2 = (this.getHeight());
+		int x = (scrollX);
+		int y = (scrollY+scrollMouse);
 		
-		item.x = x + Math.min(w,w2)/2.0;
-		item.y = y + Math.min(h,h2)/2.0;
+		PointD p = Translate.getPointD(x + Math.min(w,w2)/2, y + Math.min(h,h2)/2);
+		item.x = p.x;
+		item.y = p.y;
 		item.update();
 		
 		repaint();
@@ -223,7 +232,7 @@ public class EditorPanel extends JPanel implements ModelItem.isDelete {
 			
 			item = null;
 			for( ModelItem it: list){
-				if( it.collisionPoint(lastX-rec.x, lastY-rec.y+scrollMouse-10)){
+				if( it.collisionPoint(lastX-rec.x, lastY-rec.y+scrollMouse)){
 					item = it;
 				}
 			}

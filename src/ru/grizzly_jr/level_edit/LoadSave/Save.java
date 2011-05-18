@@ -23,7 +23,6 @@ import ru.grizzly_jr.level_edit.ShelfItem;
 import xmlwise.*;
 
 public class Save {
-	
 	public static void save(String name,InformationLevel info)
 	{
 		Map<String, Object> map = new HashMap<String, Object>();		
@@ -35,7 +34,7 @@ public class Save {
 		map.put("items", save(info.models));
 		
 		try {
-			Plist.store(map, new File("data/"+name+".level"));
+			Plist.store(map, new File("data/"+name+".plist"));
 		} catch (IOException e) {
 		}
 	}
@@ -50,7 +49,7 @@ public class Save {
 		map.put("items", save(info));
 		
 		try {
-			Plist.store(map, new File("data/"+name+".items"));
+			Plist.store(map, new File("data/"+name+".plist"));
 		} catch (IOException e) {
 		}
 	}
@@ -59,7 +58,7 @@ public class Save {
 	{
 		Map<String,Object> result = new HashMap<String, Object>();
 		result.put("x", p.getX());
-		result.put("y", p.getY());
+		result.put("y", -p.getY());
 		return result;
 	}
 	private static List<Object> save(List<ModelItem> list)
@@ -88,7 +87,7 @@ public class Save {
 	
 	private static Object save(InformationModel info)
 	{
-		List<Map<String,Object>> result = new ArrayList<Map<String,Object>>();
+		Map<String,Map<String,Object>> result = new HashMap<String,Map<String,Object>>();
 		do{
 			Element element = info.getElement();
 			for( MasterItem iter: element.items)
@@ -103,11 +102,12 @@ public class Save {
 					break;
 				case SHELF:
 					map.put("type", "shelf");
+					save(iter.physic,map);
 					save(iter.shelf,map);
 					break;
 				}
 				
-				result.add(map);
+				result.put(iter.name, map);
 			}
 		}while(info.next());
 		

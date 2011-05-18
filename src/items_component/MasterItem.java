@@ -4,6 +4,7 @@ package items_component;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
@@ -66,13 +67,14 @@ public class MasterItem {
 			WritableRaster raster = image.copyData(null);
 			imageWithShapes = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 			
+			int x = -Translate.metrsToPixel(getWidth()/2.0);
+			int y = -Translate.metrsToPixel(getHeight()/2.0);
 			for (Shape shape : physic.getShapes()) {
-				shape.draw(imageWithShapes.createGraphics());
+				shape.draw(imageWithShapes.createGraphics(),new Point(x,y));
 			}
 			
 			if( TypeItem.SHELF == type){
 				drawShelf(imageWithShapes.createGraphics());
-				
 			}
 		}
 	}
@@ -81,11 +83,14 @@ public class MasterItem {
 	{
 		g.setColor(Color.red);
 		
+		int x = -Translate.metrsToPixel(getWidth()/2.0);
+		int y = -Translate.metrsToPixel(getHeight()/2.0);
+		
 		int radius = 3;
-		int p1_x = Translate.metrsToPixel(shelf.point1.getX());
-		int p1_y = Translate.metrsToPixel(shelf.point1.getY());
-		int p2_x = Translate.metrsToPixel(shelf.point2.getX());
-		int p2_y = Translate.metrsToPixel(shelf.point2.getY());
+		int p1_x = Translate.metrsToPixel(shelf.point1.getX())-x;
+		int p1_y = Translate.metrsToPixel(shelf.point1.getY())-y;
+		int p2_x = Translate.metrsToPixel(shelf.point2.getX())-x;
+		int p2_y = Translate.metrsToPixel(shelf.point2.getY())-y;
 			
 		g.fillOval(p1_x - radius, p1_y - radius, radius * 2,radius * 2);
 		g.fillOval(p2_x - radius, p2_y - radius, radius * 2,radius * 2);

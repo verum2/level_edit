@@ -1,5 +1,6 @@
 package items_component;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -12,6 +13,7 @@ public class ShapeCircle implements Shape {
 	private PointD center;
 	private double radius;
 	private Color lineColor;
+	private int thick = 2;
 	
 	private double friction = 0.1;
 	private double spring = 0.1;
@@ -52,32 +54,27 @@ public class ShapeCircle implements Shape {
 	}
 	
 	@Override
-	public void draw(Graphics2D g) {
-		/*
-		BasicStroke stroke = new BasicStroke((float) lineOptions.getThick(),
-				BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
-				lineOptions.getDashType(), 0);
-		g.setStroke(stroke);
-		*/
+	public void draw(Graphics2D g,Point tran) {
+		g.setStroke(new BasicStroke(thick));
+		
 		g.setColor(lineColor);
-		g.drawOval( Translate.metrsToPixel(center.getX()) - Translate.metrsToPixel(radius), 
-				    Translate.metrsToPixel(center.getY()) - Translate.metrsToPixel(radius),
+		g.drawOval( Translate.metrsToPixel(center.getX()) - Translate.metrsToPixel(radius) - tran.x, 
+				    Translate.metrsToPixel(center.getY()) - Translate.metrsToPixel(radius) - tran.y,
 				    Translate.metrsToPixel( radius * 2),
 				    Translate.metrsToPixel( radius * 2));
+		
+		g.setStroke(new BasicStroke());
 	}	
-	public void drawWithZoom(Graphics2D g,double zoom,Point move) {
-		/*
-		BasicStroke stroke = new BasicStroke((float) lineOptions.getThick(),
-				BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
-				lineOptions.getDashType(), 0);
-		g.setStroke(stroke);
-		*/
+	public void drawWithZoom(Graphics2D g,double zoom,Point move,Point tran) {
+		g.setStroke(new BasicStroke(thick));
 		g.setColor(lineColor);
 		Point ccentr = Translate.pointMetrsToPixelWithZoom(center,zoom);
-		g.drawOval( ccentr.x - Translate.metrsToPixelWithZoom(radius,zoom)+move.x, 
-					ccentr.y - Translate.metrsToPixelWithZoom(radius,zoom)+move.y,
+		g.drawOval( ccentr.x - Translate.metrsToPixelWithZoom(radius,zoom)+move.x - tran.x, 
+					ccentr.y - Translate.metrsToPixelWithZoom(radius,zoom)+move.y - tran.y,
 				    Translate.metrsToPixelWithZoom( radius * 2, zoom),
 				    Translate.metrsToPixelWithZoom( radius * 2, zoom));
+		
+		g.setStroke(new BasicStroke());
 	}
 	
 	public double getFriction() {

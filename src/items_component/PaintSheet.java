@@ -128,6 +128,8 @@ public class PaintSheet extends JPanel {
 		if (null != lastCircle)
 		{
 			Point ccentr = Translate.pointMetrsToPixelWithZoom(lastCircle.getCenter(),zoom);
+			ccentr.x += Translate.metrsToPixelWithZoom(masterItem.getWidth()/2.0, zoom);
+			ccentr.y += Translate.metrsToPixelWithZoom(masterItem.getHeight()/2.0, zoom);
 			double rx = mousePos.getX() - ccentr.getX();
 			double ry = mousePos.getY() - ccentr.getY();
 			double newRadius= Math.sqrt(rx*rx + ry*ry);
@@ -141,6 +143,8 @@ public class PaintSheet extends JPanel {
 	{
 		Point point = new Point(mouseX - imagePos.x, mouseY - imagePos.y);
 		PointD value = Translate.pointPixelToMetrsWithZoom(point, zoom);
+		value.x -= masterItem.getWidth()/2.0;
+		value.y -= masterItem.getHeight()/2.0;
 		
 		if(DrawShapeType.SHELF_THREAD_1_DOWN == currentShapeType && MouseEvent.BUTTON1 == button)
 		{
@@ -266,18 +270,20 @@ public class PaintSheet extends JPanel {
 		            (int)(image.getWidth()*zoom)+2, (int)(image.getHeight()*zoom)+2);
 		
 		if( TypeItem.PHYSIC == masterItem.getType() || TypeItem.SHELF == masterItem.getType()){
+			int x = -Translate.metrsToPixelWithZoom(masterItem.getWidth()/2, zoom);
+			int y = -Translate.metrsToPixelWithZoom(masterItem.getHeight()/2, zoom);
 			for (Shape shape :  masterItem.physic.getShapes()) {
-				shape.drawWithZoom(g,zoom,imagePos);
+				shape.drawWithZoom(g,zoom,imagePos, new Point(x,y));
 			}
 			
 			if(TypeItem.SHELF == masterItem.getType()){
-				g.setColor(Color.red);
+				g.setColor(Color.red);				
 				ShelfPhysicItem shelf = masterItem.shelf;
 				int radius = 4;
-				int p1_x = Translate.metrsToPixelWithZoom(shelf.point1.getX(),zoom) + imagePos.x;
-				int p1_y =Translate.metrsToPixelWithZoom(shelf.point1.getY(),zoom) + imagePos.y;
-				int p2_x = Translate.metrsToPixelWithZoom(shelf.point2.getX(),zoom) + imagePos.x;
-				int p2_y = Translate.metrsToPixelWithZoom(shelf.point2.getY(),zoom) + imagePos.y;
+				int p1_x = Translate.metrsToPixelWithZoom(shelf.point1.getX(),zoom) + imagePos.x -x;
+				int p1_y = Translate.metrsToPixelWithZoom(shelf.point1.getY(),zoom) + imagePos.y -y;
+				int p2_x = Translate.metrsToPixelWithZoom(shelf.point2.getX(),zoom) + imagePos.x -x;
+				int p2_y = Translate.metrsToPixelWithZoom(shelf.point2.getY(),zoom) + imagePos.y -y;
 					
 				g.fillOval(p1_x - radius, p1_y - radius, radius * 2,radius * 2);
 				g.fillOval(p2_x - radius, p2_y - radius, radius * 2,radius * 2);
@@ -294,11 +300,14 @@ public class PaintSheet extends JPanel {
 			repaintImage();
 		}
 		g.drawImage(bufferImage, 0, 0, this);
+		int x = -Translate.metrsToPixelWithZoom(masterItem.getWidth()/2, zoom);
+		int y = -Translate.metrsToPixelWithZoom(masterItem.getHeight()/2, zoom);
+		
 		if (null != lastPolygon) {
-			lastPolygon.draw((Graphics2D) g,zoom, imagePos);
+			lastPolygon.draw((Graphics2D) g,zoom, imagePos, new Point(x,y));
 		}
 		if (null != lastCircle) {
-			lastCircle.drawWithZoom((Graphics2D) g,zoom,imagePos);
+			lastCircle.drawWithZoom((Graphics2D) g,zoom,imagePos, new Point(x,y));
 		}
 		
 		/*if(TypeItem.SHELF == masterItem.getType()){

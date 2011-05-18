@@ -3,7 +3,35 @@ package ru.grizzly_jr.level_edit;
 import java.awt.Point;
 
 public class Translate {
-	private static final double SIZE = 100.0;
+	private static final double SIZE = 200.0;
+	public static int height = 0;
+	public static int width = 0;
+	
+	public static Point getPoint(double x,double y, double width, double height)
+	{
+		Point p = new Point();
+		p.x =  metrsToPixel(x) - metrsToPixel(width/2.0);
+		p.y = Translate.height + metrsToPixel(y) - metrsToPixel(height/2.0);
+		
+		return p;
+	}
+	
+	public static PointD getPointD(int x, int y)
+	{
+		PointD p = new PointD(0,0);
+		p.x = pixelToMetrs(x);
+		p.y = pixelToMetrs(y - height);
+		return p;
+	}
+	
+	public static PointD getPointD(int x, int y,int w, int h)
+	{
+		PointD p = new PointD(0,0);
+		p.x = pixelToMetrs(x + w/2);
+		p.y = pixelToMetrs(y - height + h/2);
+		return p;
+	}
+	
 	
 	public static int metrsToPixel(double m)
 	{

@@ -158,7 +158,7 @@ public class Form extends JFrame {
 			return;
 		
 		InformationLevel info_level = new InformationLevel();
-		info_level.background = "data/"+name+".png";
+		info_level.background = name;
 		editor_panel.setInformation(info_level);
 		
 		repaint();
@@ -176,7 +176,10 @@ public class Form extends JFrame {
 		if( null == name)
 			return;
 		
-		Save.save(name, editor_panel.getInformation());
+		InformationLevel info = editor_panel.getInformation();
+		info.max_time = Double.valueOf(max_time.getText());
+		info.max_count_bullet = Integer.valueOf(max_count_bullet.getText());
+		Save.save(name, info);
 	}
 	
 	private void onSaveModel()
@@ -196,32 +199,15 @@ public class Form extends JFrame {
 		if( null == name)
 			return;
 		
-		/*InformationLevel info_level = new InformationLevel();
-		info_level.background = "data/back.png";
-		
-		List<MasterItem> ms = components_panel.getMasterItems();
-		info_level.models.add(new ModelItem("apple",ms,0.5,3.0));
-		info_level.models.add(new ModelItem("can",ms,0,0));
-		info_level.models.add(new ModelItem("can",ms,0.1,2.3));
-		info_level.models.add(new ModelItem("apple",ms,1.5,5.0));*/
-		
-		editor_panel.setInformation(Load.loadLevel(name));
+		InformationLevel info = Load.loadLevel(name);
+		max_count_bullet.setText( String.valueOf(info.max_count_bullet));
+		max_time.setText( String.valueOf(info.max_time));
+		editor_panel.setInformation(info);
 		repaint();
 	}
 	
 	private void onLoadModel()
 	{
-		/*List<InformationModel.Element> list = new ArrayList<InformationModel.Element>();
-		InformationModel.Element element1 = new InformationModel.Element();
-		InformationModel.Element element2 = new InformationModel.Element();
-		element1.name = "fruit";
-		element2.name = "box";
-		element1.items.add( new MasterItem("apple"));
-		element2.items.add( new MasterItem("can"));
-		list.add(element1);
-		list.add(element2);
-		
-		components_panel.setInformation(new InformationModel(list));*/
 		components_panel.setInformation(Load.loadModel("items"));
 	}
 	

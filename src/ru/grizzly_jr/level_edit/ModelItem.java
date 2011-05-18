@@ -4,6 +4,7 @@ import items_component.MasterItem;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,10 +88,11 @@ public class ModelItem {
 	
 	public boolean collisionPoint(int px,int py)
 	{
-		double pxd = Translate.pixelToMetrs(px);
-		double pyd = Translate.pixelToMetrs(py);
-		if( x > pxd || pxd > x + master.getWidth() ||
-			y > pyd || pyd > y + master.getHeight())
+		PointD p = Translate.getPointD(px, py);
+		p.x += getWidth()/2.0;
+		p.y += getHeight()/2.0;
+		if( x > p.x || p.x > x + getWidth() ||
+			y > p.y || p.y > y + getHeight())
 			return false;
 		return true;
 	}
@@ -99,9 +101,8 @@ public class ModelItem {
 	{
 		int w = Translate.metrsToPixel(getWidth());
 		int h = Translate.metrsToPixel(getHeight());
-		int x = Translate.metrsToPixel(this.x) + xS;
-		int y = Translate.metrsToPixel(this.y) + yS;
-		g.drawImage(getImage(isShaped),x,y,w,h,null);
+		Point p = Translate.getPoint(x, y, getWidth(), getHeight());
+		g.drawImage(getImage(isShaped),p.x+xS,p.y+yS,w,h,null);
 	}
 	
 	public static interface isDelete

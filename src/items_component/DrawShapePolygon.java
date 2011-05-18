@@ -42,9 +42,9 @@ public class DrawShapePolygon {
 		return shapePolygon;
 	}
 
-	public void draw(Graphics2D g,double zoom, Point move) {
+	public void draw(Graphics2D g,double zoom, Point move,Point tran) {
 
-		shapePolygon.drawWithZoom(g,false,zoom,move);
+		shapePolygon.drawWithZoom(g,false,zoom,move,tran);
 		/*
 		BasicStroke stroke = new BasicStroke((float) lineOptions.getThick(),
 				BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
@@ -54,6 +54,10 @@ public class DrawShapePolygon {
 		g.setColor(lineColor);
 		Point fp= Translate.pointMetrsToPixelWithZoom(LastPoint, zoom);
 		Point ep= Translate.pointMetrsToPixelWithZoom(ActivePoint, zoom);
+		fp.x -= tran.x;
+		fp.y -= tran.y;
+		//ep.x -= tran.x;
+		//ep.y -= tran.y;
 		g.drawLine(fp.x + move.x,fp.y + move.y,ep.x + move.x,ep.y + move.y);
 		}
 
